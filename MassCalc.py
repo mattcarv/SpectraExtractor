@@ -12,7 +12,6 @@ data = hdul[0].data
 
 # Get the WCS object from the FITS header
 wcs = WCS(hdul[0].header)
-print(wcs)
 
 # Display the image and add a color bar
 # fig, ax = plt.subplots(subplot_kw={'projection': wcs})
