@@ -30,7 +30,18 @@ print(wcs)
 # plt.clf()
 
 def LineLuminosity (data):
-    k = scp.Boltzmann
+    
+    '''
+    This function will calculate the line luminosity based on the line density
+    flux (or moment-0 map).
+    
+    beam: Solid angle of the observation in arcsec squared
+    D_l: Luminosity distance of the source in Mpc
+    z: redshift of the source
+    data: density flux map in K Km/s
+        
+    '''
+    
     beam = 1.588e3
     c = scp.c
     nu = 115.2712018000
@@ -42,6 +53,7 @@ def LineLuminosity (data):
 
     return luminosity
 
+# the line luminosity will be in units of: K Km/s pc**2
 
 lum = LineLuminosity(data)
 
@@ -68,6 +80,6 @@ ax.set_ylabel('Declination')
 ax.coords['ra'].set_axislabel('Right Ascension (J2000)')
 ax.coords['dec'].set_axislabel('Declination (J2000)')
 
-print('Max of the molecular gas mass: ', np.nanmax(M))
-print('Sum of the molecular gas mass: ', np.nansum(M))
-print('Mean of the molecular gas mass: ', np.nanmean(M))
+print('Max of the molecular gas mass: ', np.nanmax(M), 'solar masses')
+print('Sum of the molecular gas mass: ', np.nansum(M), 'solar masses')
+print('Mean of the molecular gas mass: ', np.nanmean(M), 'solar masses')
