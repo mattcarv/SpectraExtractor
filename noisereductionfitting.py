@@ -172,11 +172,13 @@ peak_intensity_sigmask = masked_cube.max(axis=0)
 
 # MOMENT MAPS -----------------------------------------------------------------
 masked_moment0 = masked_cube.moment0()
-# masked_moment1 = masked_cube.moment1()
-# masked_moment2 = masked_cube.moment2()
-# masked_linewidth = masked_cube.linewidth_sigma()
+masked_moment1 = masked_cube.moment1()
+masked_moment2 = masked_cube.moment2()
+masked_linewidth = masked_cube.linewidth_sigma()
 
 masked_moment0.write('moment0final.fits')
+masked_moment1.write('moment1final.fits')
+masked_linewidth.write('moment2final.fits')
 
 # #_______________________________________________________________
 
