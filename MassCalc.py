@@ -6,13 +6,13 @@ import scipy.constants as scp
 
 # Load the FITS file
 # hdul = fits.open('/home/mdocarm/Downloads/PROJECTUGC2885-2022/UGC 2885 H-Alpha Fits Files/Rubin_High_Binning_2_Halpha_Flux.fits')
-hdul = fits.open('lumtest.fits')
+hdul = fits.open('moment0final.fits')
 header = hdul[0].header
 data = hdul[0].data
 
 # Get the WCS object from the FITS header
 wcs = WCS(hdul[0].header)
-
+print(wcs)
 
 # Display the image and add a color bar
 # fig, ax = plt.subplots(subplot_kw={'projection': wcs})
@@ -27,27 +27,32 @@ wcs = WCS(hdul[0].header)
 # ax.coords['ra'].set_axislabel('RA (J2000)')
 # ax.coords['dec'].set_axislabel('Dec (J2000)')
 
-plt.clf()
+# plt.clf()
 
-# def LineLuminosity (data):
-#     k = scp.Boltzmann
-#     beam = 1.588e3
-#     c = scp.c
-#     nu = 115.2712018000
-#     D_l = 84.105
-#     z = 0.01935
+def LineLuminosity (data):
+    k = scp.Boltzmann
+    beam = 1.588e3
+    c = scp.c
+    nu = 115.2712018000
+    D_l = 84.105
+    z = 0.01935
     
-#     luminosity = 23.5 * beam * data * (D_l**2) * ((1 + z)**(-3))
+    luminosity = 23.5 * beam * data * (D_l**2) * ((1 + z)**(-3))
     
 
-#     return luminosity
+    return luminosity
 
 
+lum = LineLuminosity(data)
 
-# data2 = LineLuminosity(data)
+hdu = fits.PrimaryHDU(lum, header)
+hdu.writeto('lumtest.fits', overwrite=True)
 
-# hdu = fits.PrimaryHDU(data2, header)
-# hdu.writeto('lumtest.fits', overwrite=True)
+hdul = fits.open('lumtest.fits')
+header = hdul[0].header
+data = hdul[0].data
+
+wcs = WCS(hdul[0].header)
 
 M = 4.3 * data
 
@@ -60,5 +65,9 @@ cbar.set_label('Molecular Gas Mass ($M_{\odot}$)')
 ax.set_xlabel('Right Ascension')
 ax.set_ylabel('Declination')
 # ax.coords.grid(False, color='white', ls='solid')
-ax.coords['ra'].set_axislabel('RA (J2000)')
-ax.coords['dec'].set_axislabel('Dec (J2000)')
+ax.coords['ra'].set_axislabel('Right Ascension (J2000)')
+ax.coords['dec'].set_axislabel('Declination (J2000)')
+
+print('Max of the molecular gas mass: ', np.nanmax(M))
+print('Sum of the molecular gas mass: ', np.nansum(M))
+print('Mean of the molecular gas mass: ', np.nanmean(M))
