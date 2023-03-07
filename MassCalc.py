@@ -65,6 +65,8 @@ data = hdul[0].data
 
 wcs = WCS(hdul[0].header)
 
+print('Integrated Luminosity: ', np.nansum(data), 'K Km/s $pc^2$')
+
 M = 4.3 * data
 
 M_dyn = 1.4 * data
