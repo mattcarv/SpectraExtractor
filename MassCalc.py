@@ -67,10 +67,12 @@ wcs = WCS(hdul[0].header)
 
 M = 4.3 * data
 
+M_dyn = 1.4 * data
+
 fig, ax = plt.subplots(subplot_kw={'projection': wcs})
-im = ax.imshow(M, cmap='jet', vmin=0)
+im = ax.imshow(M_dyn, cmap='plasma', vmin=0)
 cbar = plt.colorbar(im)
-cbar.set_label('Molecular Gas Mass ($M_{\odot}$)')
+cbar.set_label('M$_{dyn}$ ($M_{\odot}$)')
 
 # Display the coordinates
 ax.set_xlabel('Right Ascension')
@@ -79,6 +81,6 @@ ax.set_ylabel('Declination')
 ax.coords['ra'].set_axislabel('Right Ascension (J2000)')
 ax.coords['dec'].set_axislabel('Declination (J2000)')
 
-print('Max of the molecular gas mass: ', np.nanmax(M), 'solar masses')
-print('Sum of the molecular gas mass: ', np.nansum(M), 'solar masses')
-print('Mean of the molecular gas mass: ', np.nanmean(M), 'solar masses')
+print('Max of the molecular gas mass: ', np.nanmax(M_dyn), 'solar masses')
+print('Sum of the molecular gas mass: ', np.nansum(M_dyn), 'solar masses')
+print('Mean of the molecular gas mass: ', np.nanmean(M_dyn), 'solar masses')
