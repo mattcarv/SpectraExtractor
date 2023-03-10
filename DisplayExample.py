@@ -6,17 +6,18 @@ import scipy.constants as scp
 
 # Load the FITS file
 # hdul = fits.open('/home/mdocarm/Downloads/PROJECTUGC2885-2022/UGC 2885 H-Alpha Fits Files/Rubin_High_Binning_2_Halpha_Flux.fits')
-hdul = fits.open('fc_58.268000+35.591940_iras_100.fits')
+hdul = fits.open('C:/Users/mathe/Downloads/UGC2885FILES-part1/fc_58.268000+35.591940_iras_100.fits')
 header = hdul[0].header
 data = hdul[0].data
 
 #hdul2 = fits.open('C:/Users/mathe/OneDrive/Documents/PROJECTUGC2885-2022/UGC 2885 H-Alpha Fits Files/moment0co10.fits')
-hdul2 = fits.open('C:/Users/mathe/Downloads/UGC2885FILES-part1/fc_58.268000+35.591940_dss_dss2ir.fits')
-wcs = WCS(hdul2[0].header)
+hdul2 = fits.open('C:/Users/mathe/Downloads/UGC2885FILES-part1/fc_58.268000+35.591940_2mass_k.fits')
+wcs = WCS(hdul[0].header)
 
 
-IR_100 = np.sum(data)
-print(IR_100, 'Jy')
+IR_100 = np.nansum(data)
+print('Sum: ',IR_100, 'Jy')
+print('Mean: ', np.nanmean(data), 'Jy')
 
 # Get the WCS object from the FITS header
 
@@ -24,8 +25,8 @@ print(IR_100, 'Jy')
 # Display the image and add a color bar
 fig, ax = plt.subplots(subplot_kw={'projection': wcs})
 im = ax.imshow(data, cmap='inferno')
-cbar = plt.colorbar(im)
-cbar.set_label('Flux (Jy)')
+# cbar = plt.colorbar(im)
+# cbar.set_label('Flux (Jy)')
 
 # Display the coordinates
 ax.set_xlabel('Right Ascension')
