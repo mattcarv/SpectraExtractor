@@ -17,8 +17,12 @@ median = da.from_array(np.nanpercentile(smoothed.compute(), 75))
 # Subtract background from image
 background_subtracted = image - median
 
-max_val = da.nansum(background_subtracted).compute()
-print(max_val)
+new_array = np.array(background_subtracted)
+max_val = np.nanmax(new_array)
+total = np.nansum(np.clip(new_array, 0, max_val))
+print(total)
+# max_val = da.nansum(background_subtracted).compute()
+# print(max_val)
 
 # Save the subtracted file
 header = hdul[0].header
