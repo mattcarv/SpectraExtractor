@@ -34,12 +34,12 @@ hdu.writeto("output.fits", overwrite=True)
 # Plot both figures
 fig, ax = plt.subplots(1, 2, figsize=(15, 6))
 
-im1 = ax[0].imshow(image, cmap='viridis', vmin=0, vmax=9e-18)
+im1 = ax[0].imshow(image, cmap='viridis', vmin=0, vmax=1e-17)
 ax[0].invert_yaxis()
 ax[0].set_title('Original')
 
 # Plot second array in second subplot
-im2 = ax[1].imshow(background_subtracted, cmap='viridis', vmin=0, vmax=9e-18)
+im2 = ax[1].imshow(background_subtracted, cmap='viridis', vmin=0, vmax=1e-17)
 ax[1].invert_yaxis()
 ax[1].set_title('Subtracted using a median filter')
 
