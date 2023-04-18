@@ -13,19 +13,10 @@ data = hdul[0].data
 #hdul2 = fits.open('C:/Users/mathe/Downloads/UGC2885FILES-part1/fc_58.268000+35.591940_2mass_k.fits')
 # wcs = WCS(hdul[0].header)
 
-def SFR(data):
-    
-    D_l = 84.76
-    lum = 4*np.pi*((3.086e24*D_l)**2)*data*6562.8
-    
-    SFR = 5.5e-42 * lum
-    
-    return SFR
-
-
-StarFR = SFR(data)
-total = np.nansum(data)
+max_val = np.nanmax(data)
+total = np.nansum(np.clip(data, np.nanmin(data), max_val))
 print(total)
+print(np.nansum(data[data>0]))
 
 # # Display the image and add a color bar
 # fig, ax = plt.subplots(subplot_kw={'projection': wcs})
