@@ -8,7 +8,7 @@ from astropy.wcs import WCS
 hdu = fits.open('maskedcube.fits')[0]
 
 
-hdu2 = fits.open('/home/mdocarm/Downloads/PROJECTUGC2885-2022/montage/moment0co10.fits')
+hdu2 = fits.open('moment0co10.fits')
 header = hdu2[0].header
 wcs = WCS(hdu2[0].header)
 
@@ -28,6 +28,7 @@ def animate(i):
     
     cbar = fig.colorbar(im)
     cbar.set_label('Brightness Temperature (K)')
+    plt.clim(0, 0.05)
 
 # Set up the figure and animation
 fig, ax = plt.subplots(subplot_kw={'projection': wcs})
