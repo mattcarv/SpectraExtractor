@@ -3,16 +3,20 @@ from pathlib import Path
 from time import time
 import warnings
 
+
 import numpy as np
 import matplotlib.pyplot as plt
 # plt.style.use('seaborn-colorblind')
 
 import astropy.units as u
 from astropy.io import fits
+from astropy.wcs import WCS
+from astropy.wcs.utils import proj_plane_pixel_scales
 
 from spectral_cube import SpectralCube
 
-
+#%%
+warnings.filterwarnings('ignore')
 filename = fits.open('ugc2885_co10_v4.fits')
 
 cube = SpectralCube.read(filename, format='fits', use_dask=True)
@@ -21,24 +25,41 @@ cube = cube.spectral_slab(cube.spectral_axis[13], cube.spectral_axis[100])
 
 cube = cube.with_spectral_unit(u.km / u.s)
 
-cube
-
+header = filename[0].header
+wcs = WCS(filename[0].header)
 peak_intensity = cube.max(axis=0)
-
+plt.rcParams.update({'font.size': 18})
 # peak_intensity.quicklook()
+# plt.imshow(peak_intensity[0,:,:])
+
+pixel_scale = proj_plane_pixel_scales(wcs)[0] * u.deg / u.pixel
+arcmin = 1 * u.arcmin.to(u.deg)
+arcmin_pixel = (arcmin / pixel_scale).value
+
+
+# plt.figure(figsize=(10,8))
+# ax = plt.subplot(projection=peak_intensity.wcs)
+# im = ax.imshow(peak_intensity.value, origin='lower', cmap='viridis', vmax=0.25)
+# ax.plot([6, 6 + arcmin_pixel], [6, 6], color='black', lw=2)
+# ax.text(6 + arcmin_pixel / 2, 8, '1 arcmin', color='black',
+#           ha='center', va='bottom', fontsize=16)
+# ax.coords['ra'].set_axislabel('Right Ascension (J2000)')
+# ax.coords['dec'].set_axislabel('Declination (J2000)')
+# cbar = plt.colorbar(im)
+# cbar.set_label('Peak (K)')
 
 mad_std_spectrum = cube.mad_std(axis=(1, 2))
 
 # mean standard deviation throughout the whole cube
-print(np.mean(mad_std_spectrum))
+# print(np.mean(mad_std_spectrum))
 
+# plt.figure(figsize=(10,8))
 # plt.plot(mad_std_spectrum.spectral_axis.value, mad_std_spectrum.value, drawstyle='steps-mid')
 # plt.xlabel('Velocity (km/s)')
 # plt.ylabel(r' Noise standard deviation $\sigma$ (K)')
 
 # # # Best to extend the range to 0.
-# plt.ylim([0.005, 0.02])
-
+# plt.ylim([0.0065, 0.012])
 # plt.axhline(0.00799, linestyle='--', color='k', linewidth=3, 
 #             label='Average level of $\sigma$')
 # plt.legend(frameon=True)
@@ -53,15 +74,26 @@ mad_std_spectrum_sclip = cube_sclip.mad_std(axis=(1, 2))
 # plt.ylabel(r' Noise standard deviation $\sigma$ (K)')
 
 # # # Best to extend the range to 0.
-# plt.ylim([0.005, 0.02])
+# plt.ylim([0.006, 0.012])
 
 # plt.axhline(0.0077, linestyle='--', color='k', linewidth=3, label='A priori noise expectation')
 # plt.legend(frameon=True)
-
+#%%
 mad_std_map_sclip = cube_sclip.mad_std(axis=0) # Calculate sigma along the spectral dimension
 
 # mad_std_map_sclip.quicklook()
 
+# plt.figure(figsize=(10,8))
+# ax = plt.subplot(projection=mad_std_map_sclip.wcs)
+# im = ax.imshow(mad_std_map_sclip.value, origin='lower', cmap='viridis', vmax=0.12)
+# ax.plot([6, 6 + arcmin_pixel], [6, 6], color='black', lw=2)
+# ax.text(6 + arcmin_pixel / 2, 8, '1 arcmin', color='black',
+#          ha='center', va='bottom', fontsize=16)
+# ax.coords['ra'].set_axislabel('Right Ascension (J2000)')
+# ax.coords['dec'].set_axislabel('Declination (J2000)')
+# cbar = plt.colorbar(im)
+# cbar.set_label('Peak (K)')
+#%%
 low_snr_mask = (cube > 2 * mad_std_map_sclip).include()
 high_snr_mask = (cube > 5 * mad_std_map_sclip).include()
 
@@ -141,6 +173,16 @@ masked_cube = cube.with_mask(signal_mask)
 
 peak_intensity_sigmask = masked_cube.max(axis=0)
 
+# plt.figure(figsize=(10,8))
+# ax = plt.subplot(projection=peak_intensity_sigmask.wcs)
+# im = ax.imshow(peak_intensity_sigmask.value, origin='lower', cmap='viridis')
+# ax.plot([6, 6 + arcmin_pixel], [6, 6], color='black', lw=2)
+# ax.text(6 + arcmin_pixel / 2, 8, '1 arcmin', color='black',
+#          ha='center', va='bottom', fontsize=16)
+# ax.coords['ra'].set_axislabel('Right Ascension (J2000)')
+# ax.coords['dec'].set_axislabel('Declination (J2000)')
+# cbar = plt.colorbar(im)
+# cbar.set_label('Peak (K)')
 
 # ax = plt.subplot(projection=peak_intensity_sigmask.wcs)
 # im = ax.imshow(peak_intensity_sigmask.value, origin='lower', cmap='viridis')
@@ -176,45 +218,55 @@ masked_moment1 = masked_cube.moment1()
 masked_moment2 = masked_cube.moment2()
 masked_linewidth = masked_cube.linewidth_sigma()
 
-masked_moment0.write('moment0final.fits')
-masked_moment1.write('moment1final.fits')
-masked_linewidth.write('moment2final.fits')
+# masked_moment0.write('moment0final.fits')
+# masked_moment1.write('moment1final.fits')
+# masked_linewidth.write('moment2final.fits')
+wcs = masked_moment0.wcs
+# #_______________________________________________________________
+# fig, (ax1, ax2, ax3) = plt.subplots(1, 3, subplot_kw={'projection': wcs}, 
+#                                     figsize=(34, 8))
+
+
+# ax1 = plt.subplot(projection=masked_moment0.wcs)
+#----
+# im1 = ax1.imshow(masked_moment0.value, origin='lower', cmap='inferno')
+# ax1.plot([6, 6 + arcmin_pixel], [6, 6], color='black', lw=2)
+# ax1.text(6 + arcmin_pixel / 2, 8, '1 arcmin', color='black',
+#           ha='center', va='bottom', fontsize=16)
+# cbar1 = plt.colorbar(im1)
+# cbar1.set_label('Integrated Intensity (K km/s)')
+# ax1.set_ylabel('Declination (J2000)')
+# ax1.set_xlabel('Right Ascension (J2000)')
 
 # #_______________________________________________________________
 
-# ax = plt.subplot(projection=masked_moment0.wcs)
-
-# im = ax.imshow(masked_moment0.value, origin='lower', cmap='inferno')
-
-# cbar = plt.colorbar(im)
-# cbar.set_label('Integrated Intensity (K km/s)')
-
-# ax.set_ylabel('Declination')
-# ax.set_xlabel('Right Ascension')
-
-# #_______________________________________________________________
-
-# ax = plt.subplot(projection=masked_moment1.wcs)
-
-# im = ax.imshow(masked_moment1.value, origin='lower', cmap='coolwarm', vmin=5000, vmax=6200)
-# cbar = plt.colorbar(im)
-# cbar.set_label('Centroid (km/s)')
-
-# ax.set_ylabel('Declination')
-# ax.set_xlabel('Right Ascension')
+# ax2 = plt.subplot(projection=masked_moment1.wcs)
+#----
+# im2 = ax2.imshow(masked_moment1.value, origin='lower', cmap='coolwarm', vmin=5000, vmax=6200)
+# ax2.plot([6, 6 + arcmin_pixel], [6, 6], color='black', lw=2)
+# ax2.text(6 + arcmin_pixel / 2, 8, '1 arcmin', color='black',
+#           ha='center', va='bottom', fontsize=16)
+# cbar2 = plt.colorbar(im2)
+# cbar2.set_label('Centroid (km/s)')
+# ax2.set_ylabel('Declination (J2000)')
+# ax2.set_xlabel('Right Ascension (J2000)')
 
 # #_______________________________________________________________
 
 
-# ax = plt.subplot(projection=masked_linewidth.wcs)
+# ax3 = plt.subplot(projection=masked_linewidth.wcs)
+#----
+# im3 = ax3.imshow(masked_linewidth.value, origin='lower', cmap='coolwarm')
+# ax3.plot([6, 6 + arcmin_pixel], [6, 6], color='black', lw=2)
+# ax3.text(6 + arcmin_pixel / 2, 8, '1 arcmin', color='black',
+#           ha='center', va='bottom', fontsize=16)
+# cbar3 = plt.colorbar(im3)
+# cbar3.set_label('Line Width (km/s)')
+# ax3.set_ylabel('Declination (J2000)')
+# ax3.set_xlabel('Right Ascension (J2000)')
 
-# im = ax.imshow(masked_linewidth.value, origin='lower', cmap='coolwarm')
-# cbar = plt.colorbar(im)
-# cbar.set_label('Line Width (km/s)')
-
-# ax.set_ylabel('Declination')
-# ax.set_xlabel('Right Ascension')
-
+# plt.show()
+#%%
 # CUBE FITTING ----------------------------------------------------------------
 # y, x = 33, 33
 # size = 33
