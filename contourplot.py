@@ -10,7 +10,7 @@ header = hdul[0].header
 data = hdul[0].data/1000
 wcs = WCS(hdul[0].header)
 
-hdul2 = fits.open('/home/mdocarm/Downloads/PROJECTUGC2885-2022/CO-files-20221207T192945Z-001/CO-files/moment0final.fits')
+hdul2 = fits.open('/home/mdocarm/Downloads/PROJECTUGC2885-2022/CO-files-20221207T192945Z-001/moment0finalreal.fits')
 data2 = hdul2[0].data
 plt.rcParams.update({'font.size': 18})
 plt.rcParams["figure.figsize"] = (10,8)
