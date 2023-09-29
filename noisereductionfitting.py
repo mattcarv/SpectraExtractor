@@ -31,7 +31,7 @@ for i in range(num_slices):
 modified_cube = SpectralCube(data=np.array(modified_slices), wcs=cube_original.wcs, 
                              mask=None, meta=None)
 
-modified_cube.write('modifiedcube.fits')
+modified_cube.write('modifiedcube.fits', overwrite=True)
 
 filename = fits.open('modifiedcube.fits')
 
@@ -61,7 +61,7 @@ ax.coords['ra'].set_axislabel('Right Ascension (J2000)')
 ax.coords['dec'].set_axislabel('Declination (J2000)')
 cbar = plt.colorbar(im)
 cbar.set_label('Peak (K)')
-plt.clf()
+plt.show()
 
 mad_std_spectrum = cube.mad_std(axis=(1, 2))
 
@@ -92,7 +92,7 @@ plt.ylabel(r' Noise standard deviation $\sigma$ (K)')
 # Best to extend the range to 0.
 plt.ylim([0.008, 0.013])
 
-plt.axhline(0.0096, linestyle='--', color='k', linewidth=3, label='A priori noise expectation')
+plt.axhline(0.0096, linestyle='--', color='k', linewidth=3, label='Average noise level')
 plt.legend(frameon=True)
 plt.show()
 #%% Here we display the noise map - notice the edge effects from the observation
@@ -111,7 +111,7 @@ ax.coords['ra'].set_axislabel('Right Ascension (J2000)')
 ax.coords['dec'].set_axislabel('Declination (J2000)')
 cbar = plt.colorbar(im)
 cbar.set_label('Peak (K)')
-plt.clf()
+plt.show()
 #%% Here we define the masks
 low_snr_mask = (cube > 3 * mad_std_map_sclip).include()
 high_snr_mask = (cube > 5 * mad_std_map_sclip).include()
@@ -198,7 +198,7 @@ signal_mask = signal_mask.compute()
 
 masked_cube = cube.with_mask(signal_mask)
 
-# masked_cube.write('maskedcube.fits')
+masked_cube.write('maskedcube.fits', overwrite=True)
 
 # I chose to have the actual file so I could use different codes to analyze it
 # instead of having to run this one every single time.
@@ -215,8 +215,7 @@ im = ax.imshow(peak_intensity_sigmask.value, origin='lower', cmap='viridis')
 ax.plot([6, 6 + arcmin_pixel], [6, 6], color='black', lw=2)
 ax.text(6 + arcmin_pixel / 2, 8, '1 arcmin', color='black',
           ha='center', va='bottom', fontsize=16)
-ax.coords['ra'].set_axislabel('Right Ascension (J2000)')
-ax.coords['dec'].set_axislabel('Declination (J2000)')
+
 cbar = plt.colorbar(im)
 cbar.set_label('Peak (K)')
 
@@ -224,9 +223,8 @@ ax = plt.subplot(projection=peak_intensity_sigmask.wcs)
 im = ax.imshow(peak_intensity_sigmask.value, origin='lower', cmap='viridis')
 cbar = plt.colorbar(im)
 cbar.set_label('Peak (K)')
-
-ax.set_ylabel('Declination')
-ax.set_xlabel('Right Ascension')
+ax.coords['ra'].set_axislabel('Right Ascension (J2000)')
+ax.coords['dec'].set_axislabel('Declination (J2000)')
 plt.show()
 
 # This is an example noise-reduced spectrum of a pixel. In orange you have the
@@ -282,7 +280,7 @@ def LineLuminosity (data):
     '''
     
     beam = 558
-    D_l = 82.11
+    D_l = 84.11
     z = 0.01935
     
     luminosity = 23.5 * beam * (D_l**2)* data * ((1 + z)**(-3))
