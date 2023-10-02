@@ -280,7 +280,7 @@ def LineLuminosity (data):
     '''
     
     beam = 558
-    D_l = 84.11
+    D_l = 84.34
     z = 0.01935
     
     luminosity = 23.5 * beam * (D_l**2)* data * ((1 + z)**(-3))
