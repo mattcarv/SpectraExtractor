@@ -5,7 +5,7 @@ import numpy as np
 
 # Define constants
 beam = 558
-D_l = 84.11
+D_l = 84.34
 z = 0.01935
 conversion_factor = 4.3 * 23.5 * beam * (D_l**2) * ((1 + z)**(-3))
 
