@@ -29,7 +29,7 @@ plt.plot([6, 6 + arcmin_pixel], [6, 6], color='black', lw=2)
 plt.text(6 + arcmin_pixel / 2, 8, '1 arcmin', color='black',
          ha='center', va='bottom', fontsize=16)
 plt.grid(color='black', lw=0.5, alpha=0.5)
-plt.text(24, 58, 'Flux (DN)')
+plt.text(24, 58, 'Flux (log DN)')
 
 cax1 = fig.add_axes([0.165, 0.95, 0.77, 0.04])
 cbar1 = fig.colorbar(im1, cax=cax1, orientation='horizontal', spacing='proportional')
@@ -37,7 +37,7 @@ cbar1.ax.tick_params(direction='out', labeltop=True, labelbottom=False, top=True
 
 cax2 = fig.add_axes([0.96, 0.1, 0.03, 0.8])
 cbar2 = fig.colorbar(im2, cax=cax2, pad=0.03)
-cbar2.set_label('Flux (DN)')
+cbar2.set_label('Flux (log DN)')
 
 
 ax.coords['ra'].set_axislabel('Right Ascension (J2000)')
