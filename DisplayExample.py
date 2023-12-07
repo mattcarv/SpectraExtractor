@@ -31,6 +31,24 @@ ax.coords['dec'].set_axislabel('Declination (J2000)')
 ax.invert_yaxis()
 ax.set_facecolor('k')
 
+# Pixel coordinates for the bottom right of the image
+pixel_x = 7984 - 500  # Adjust the value as needed
+pixel_y = 8695 - 500  # Adjust the value as needed
+
+# Add legend with arrows for North and East at the bottom right
+arrow_length = 1000
+arrow_head_width = 30
+
+# Arrow for North
+ax.annotate("N", xy=(pixel_x, pixel_y), xytext=(pixel_x, pixel_y),
+            arrowprops=dict(arrowstyle="->", lw=2, color='white'),
+            ha='center', va='center', color='white', fontsize=14)
+
+# Arrow for East
+ax.annotate("E", xy=(pixel_x, pixel_y), xytext=(pixel_x + arrow_length, pixel_y),
+            arrowprops=dict(arrowstyle="->", lw=2, color='white'),
+            ha='center', va='center', color='white', fontsize=14)
+
 # hdu = fits.PrimaryHDU(data2, header=hdul2[0].header)
 # hdu.writeto('f606_rotated.fits')
 
