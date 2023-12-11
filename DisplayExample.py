@@ -7,7 +7,7 @@ from PIL import Image
 from scipy import ndimage
 
 hdul2 = fits.open('/home/mdocarm/Downloads/f475_mosaic.fits')
-image = Image.open('HST_rgb.png')
+image = Image.open('/home/mdocarm/Downloads/HST_rgb.png')
 # data2 = hdul2[0].data
 wcs = WCS(hdul2[0].header)
 plt.rcParams.update({'font.size': 18})

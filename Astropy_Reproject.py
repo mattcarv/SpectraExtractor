@@ -3,7 +3,7 @@ from astropy.utils.data import get_pkg_data_filename
 
 
 hdu1 = fits.open('/home/mdocarm/Downloads/f475_mosaic.fits')[0]
-hdu2 = fits.open('/home/mdocarm/Downloads/f814_mosaic.fits')[0]
+hdu2 = fits.open('/home/mdocarm/Downloads/PROJECTUGC2885-2022/U2885-HI/projected_deidre.fits')[0]
 
 from astropy.wcs import WCS
 import matplotlib.pyplot as plt
@@ -45,4 +45,4 @@ ax2.coords['dec'].set_axislabel_position('r')
 ax2.coords['dec'].set_ticklabel_position('r')
 ax2.set_title('MSX band E image footprint')
 
-fits.writeto('f814_reprojected_final.fits', array, hdu1.header, overwrite=True)
+fits.writeto('/home/mdocarm/Downloads/hideidrereproject.fits', array, hdu1.header, overwrite=True)
