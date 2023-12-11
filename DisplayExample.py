@@ -32,22 +32,25 @@ ax.invert_yaxis()
 ax.set_facecolor('k')
 
 # Pixel coordinates for the bottom right of the image
-pixel_x = 7984 - 500  # Adjust the value as needed
+pixel_x = 7984 - 1200  # Adjust the value as needed
 pixel_y = 8695 - 500  # Adjust the value as needed
 
 # Add legend with arrows for North and East at the bottom right
-arrow_length = 1000
+arrow_length = 850
 arrow_head_width = 30
 
 # Arrow for North
-ax.annotate("N", xy=(pixel_x, pixel_y), xytext=(pixel_x, pixel_y),
+ax.annotate("", xy=(pixel_x, pixel_y-arrow_length), xytext=(pixel_x, pixel_y),
             arrowprops=dict(arrowstyle="->", lw=2, color='white'),
             ha='center', va='center', color='white', fontsize=14)
 
 # Arrow for East
-ax.annotate("E", xy=(pixel_x, pixel_y), xytext=(pixel_x + arrow_length, pixel_y),
+ax.annotate("", xy=(pixel_x+arrow_length, pixel_y), xytext=(pixel_x, pixel_y),
             arrowprops=dict(arrowstyle="->", lw=2, color='white'),
             ha='center', va='center', color='white', fontsize=14)
+
+plt.text(6784, 7345, 'N', color='w', ha='center', va='bottom', fontsize=14)
+plt.text(7694, 8295, 'E', color='w', ha='center', va='bottom', fontsize=14)
 
 # hdu = fits.PrimaryHDU(data2, header=hdul2[0].header)
 # hdu.writeto('f606_rotated.fits')
