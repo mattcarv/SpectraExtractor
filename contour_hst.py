@@ -20,13 +20,13 @@ data3 = hdul3[0].data
 
 fig, ax = plt.subplots(subplot_kw={'projection': wcs})
 im_png = ax.imshow(data2, origin='lower', cmap='BuPu', vmin=0.0001, vmax=0.05)
-#im_fits = ax.contour(data_iram, origin='lower', cmap='winter')
-im_hi = ax.contour(data3, cmap='Greens', vmin=10, alpha=0.9)
+im_fits = ax.contour(data_iram, origin='lower', cmap='winter')
+#im_hi = ax.contour(data3, cmap='Greens', vmin=10, alpha=0.9)
 
 ax.coords['ra'].set_axislabel('Right Ascension (J2000)')
 ax.coords['dec'].set_axislabel('Declination (J2000)')
 
-cbar = plt.colorbar(im_hi)
+cbar = plt.colorbar(im_fits)
 cbar.set_label('Integrated Flux ($Jy\; beam^{-1}\; m \; s^{-1}$)')
 
 plt.show()
