@@ -45,12 +45,12 @@ ax.annotate("", xy=(pixel_x, pixel_y-arrow_length), xytext=(pixel_x, pixel_y),
             ha='center', va='center', color='white', fontsize=14)
 
 # Arrow for East
-ax.annotate("", xy=(pixel_x+arrow_length, pixel_y), xytext=(pixel_x, pixel_y),
+ax.annotate("", xy=(pixel_x-arrow_length, pixel_y), xytext=(pixel_x, pixel_y),
             arrowprops=dict(arrowstyle="->", lw=2, color='white'),
             ha='center', va='center', color='white', fontsize=14)
 
 plt.text(6784, 7345, 'N', color='w', ha='center', va='bottom', fontsize=14)
-plt.text(7694, 8295, 'E', color='w', ha='center', va='bottom', fontsize=14)
+plt.text(5900, 8295, 'E', color='w', ha='center', va='bottom', fontsize=14)
 
 # hdu = fits.PrimaryHDU(data2, header=hdul2[0].header)
 # hdu.writeto('f606_rotated.fits')
