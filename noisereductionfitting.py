@@ -53,7 +53,7 @@ arcmin_pixel = (arcmin / pixel_scale).value
 
 plt.figure(figsize=(10,8))
 ax = plt.subplot(projection=peak_intensity.wcs)
-im = ax.imshow(peak_intensity.value, origin='lower', cmap='viridis', vmax=0.25)
+im = ax.imshow(peak_intensity.value, origin='lower', cmap='viridis', vmax=0.15)
 ax.plot([6, 6 + arcmin_pixel], [6, 6], color='black', lw=2)
 ax.text(6 + arcmin_pixel / 2, 8, '1 arcmin', color='black',
           ha='center', va='bottom', fontsize=16)
@@ -66,7 +66,7 @@ plt.show()
 mad_std_spectrum = cube.mad_std(axis=(1, 2))
 
 # Mean standard deviation throughout the whole cube:
-print(np.mean(mad_std_spectrum))
+
 
 plt.figure(figsize=(10,8))
 plt.plot(mad_std_spectrum.spectral_axis.value, mad_std_spectrum.value, drawstyle='steps-mid')
@@ -74,27 +74,27 @@ plt.xlabel('Velocity (km/s)')
 plt.ylabel(r' Noise standard deviation $\sigma$ (K)')
 
 # # Best to extend the range to 0.
-plt.ylim([0.008, 0.015])
+plt.ylim([0.007, 0.015])
 plt.axhline(0.0096, linestyle='--', color='k', linewidth=3, 
             label='Average level of $\sigma$')
 plt.legend(frameon=True)
 plt.clf()
 
 # Clip values above 3-sigma
-cube_sclip = cube.sigma_clip_spectrally(3) 
+cube_sclip = cube.sigma_clip_spectrally(2) 
 
 mad_std_spectrum_sclip = cube_sclip.mad_std(axis=(1, 2))
 
 plt.plot(mad_std_spectrum_sclip.spectral_axis.value, mad_std_spectrum_sclip.value, drawstyle='steps-mid')
 plt.xlabel('Velocity (km/s)')
 plt.ylabel(r' Noise standard deviation $\sigma$ (K)')
-
+print(np.mean(mad_std_spectrum_sclip))
 # Best to extend the range to 0.
-plt.ylim([0.008, 0.013])
+plt.ylim([0.007, 0.015])
 
-plt.axhline(0.0096, linestyle='--', color='k', linewidth=3, label='Average noise level')
+plt.axhline(0.0081, linestyle='--', color='k', linewidth=3, label='Average noise level')
 plt.legend(frameon=True)
-plt.show()
+plt.clf()
 #%% Here we display the noise map - notice the edge effects from the observation
 
 mad_std_map_sclip = cube_sclip.mad_std(axis=0) # Calculate sigma along the spectral dimension
@@ -103,7 +103,7 @@ mad_std_map_sclip = cube_sclip.mad_std(axis=0) # Calculate sigma along the spect
 
 plt.figure(figsize=(10,8))
 ax = plt.subplot(projection=mad_std_map_sclip.wcs)
-im = ax.imshow(mad_std_map_sclip.value, origin='lower', cmap='viridis', vmax=0.12)
+im = ax.imshow(mad_std_map_sclip.value, origin='lower', cmap='viridis', vmax=0.15)
 ax.plot([6, 6 + arcmin_pixel], [6, 6], color='black', lw=2)
 ax.text(6 + arcmin_pixel / 2, 8, '1 arcmin', color='black',
           ha='center', va='bottom', fontsize=16)
