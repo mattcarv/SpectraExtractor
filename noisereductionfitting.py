@@ -53,6 +53,7 @@ arcmin_pixel = (arcmin / pixel_scale).value
 
 plt.figure(figsize=(10,8))
 ax = plt.subplot(projection=peak_intensity.wcs)
+ax.grid(True)
 im = ax.imshow(peak_intensity.value, origin='lower', cmap='viridis', vmax=0.15)
 ax.plot([6, 6 + arcmin_pixel], [6, 6], color='black', lw=2)
 ax.text(6 + arcmin_pixel / 2, 8, '1 arcmin', color='black',
@@ -81,7 +82,7 @@ plt.legend(frameon=True)
 plt.clf()
 
 # Clip values above 3-sigma
-cube_sclip = cube.sigma_clip_spectrally(2) 
+cube_sclip = cube.sigma_clip_spectrally(3) 
 
 mad_std_spectrum_sclip = cube_sclip.mad_std(axis=(1, 2))
 
@@ -103,6 +104,7 @@ mad_std_map_sclip = cube_sclip.mad_std(axis=0) # Calculate sigma along the spect
 
 plt.figure(figsize=(10,8))
 ax = plt.subplot(projection=mad_std_map_sclip.wcs)
+ax.grid(True)
 im = ax.imshow(mad_std_map_sclip.value, origin='lower', cmap='viridis', vmax=0.15)
 ax.plot([6, 6 + arcmin_pixel], [6, 6], color='black', lw=2)
 ax.text(6 + arcmin_pixel / 2, 8, '1 arcmin', color='black',
@@ -210,21 +212,20 @@ masked_cube.write('maskedcube.fits', overwrite=True)
 peak_intensity_sigmask = masked_cube.max(axis=0)
 
 plt.figure(figsize=(10,8))
+
 ax = plt.subplot(projection=peak_intensity_sigmask.wcs)
+ax.grid(True)
 im = ax.imshow(peak_intensity_sigmask.value, origin='lower', cmap='viridis')
 ax.plot([6, 6 + arcmin_pixel], [6, 6], color='black', lw=2)
 ax.text(6 + arcmin_pixel / 2, 8, '1 arcmin', color='black',
           ha='center', va='bottom', fontsize=16)
 
-cbar = plt.colorbar(im)
-cbar.set_label('Peak (K)')
-
-ax = plt.subplot(projection=peak_intensity_sigmask.wcs)
 im = ax.imshow(peak_intensity_sigmask.value, origin='lower', cmap='viridis')
 cbar = plt.colorbar(im)
 cbar.set_label('Peak (K)')
 ax.coords['ra'].set_axislabel('Right Ascension (J2000)')
 ax.coords['dec'].set_axislabel('Declination (J2000)')
+
 plt.show()
 
 # This is an example noise-reduced spectrum of a pixel. In orange you have the
@@ -243,7 +244,7 @@ plt.legend(frameon=True)
 
 plt.xlabel("Velocity (km/s)")
 plt.ylabel('Brightness Temp. (K)')
-plt.clf()
+plt.show()
 
 # %%MOMENT MAPS -----------------------------------------------------------------
 masked_moment0 = masked_cube.moment0()
@@ -255,9 +256,9 @@ masked_linewidth = masked_cube.linewidth_sigma()
 # properties of the velocity and dispersion.
 
 
-masked_moment0.write('moment0final.fits', overwrite=True)
-masked_moment1.write('moment1final.fits', overwrite=True)
-masked_linewidth.write('moment2final.fits', overwrite=True)
+#masked_moment0.write('moment0final.fits', overwrite=True)
+#masked_moment1.write('moment1final.fits', overwrite=True)
+#masked_linewidth.write('moment2final.fits', overwrite=True)
 
 hdul = fits.open('moment0final.fits')
 header = hdul[0].header

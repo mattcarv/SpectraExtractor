@@ -38,11 +38,11 @@ std = params[1]
 print(std)
 
 # Plot the histogram and fitted curve
-plt.plot(x, pdf, 'r-', label=f'Gaussian Fit: $\sigma$={std:.3f}')
+plt.plot(x, pdf, 'r-', label='Gaussian Fit; $\sigma_{CO}$=0.0012 K')
 plt.xlabel('Peak Intensity (K)')
 plt.ylabel('Number of Pixels')
-plt.axvline(x=mean - std, color='g', linestyle='--', label='Mean - Std Dev')
-plt.axvline(x=mean + std, color='g', linestyle='--', label='Mean + Std Dev')
+plt.axvline(x=mean - std, color='g', linestyle='--', label='Mean - $\sigma$')
+plt.axvline(x=mean + std, color='g', linestyle='--', label='Mean + $\sigma$')
 plt.legend()
 plt.title(f'Channel {channel_index}')
 plt.show()
