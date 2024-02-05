@@ -15,7 +15,8 @@ df = dat.to_pandas()
 # SELECTION
 
 u2885 = pd.DataFrame({'LOGMSTAR': [11.68], 'LOGSFR_BEST': [0.21], 'LOGTDEP_H2': [11.04],
-                      'LOGTDEP_HI': [10.6], 'Z_PP04_O3N2': [9.05], 'Z_PP04_N2': [9.21]})
+                      'LOGTDEP_HI': [10.6], 'Z_PP04_O3N2': [9.05], 'Z_PP04_N2': [9.21],
+                      'LOGMH2': [11.27]})
 
 df = df[df.LOGMH2>0]
 
@@ -123,3 +124,33 @@ cbar.set_label('12 + $log(O/H)$')
 # print("c:", params[2])
 plt.show()
 
+#%%
+# Plotting the MGMS
+
+def linear_function(x, a, b):
+    return a * x + b
+
+filtered_df = df[df.LOGMSTAR.apply(np.isfinite) & df.LOGSFR_BEST.apply(np.isfinite)]
+filtered_df_curve = filtered_df[filtered_df.LOGMSTAR < 11.5]
+
+x = filtered_df.LOGMSTAR
+y = filtered_df.LOGMH2
+params_linear = np.polyfit(filtered_df_curve.LOGMSTAR, filtered_df_curve.LOGMH2, deg=1)
+
+x_fit = np.linspace(min(x), 11.4, 100)
+y_fit = linear_function(x_fit, *params_linear)
+
+
+plt.scatter(x, filtered_df.LOGMH2, c=filtered_df.LOGSFR_BEST, cmap='magma')
+plt.text(11.38, 11.12, 'UGC 2885', c='black', fontsize=12)
+plt.ylim(7.4, 11.4)
+plt.plot(x_fit, y_fit, 'k', linewidth=2)
+plt.plot(x_fit, y_dotted+0.4, 'k-.', linewidth=1)
+plt.plot(x_fit, y_dotted-0.4, 'k-.', linewidth=1)
+plt.ylabel('log Molecular Gas Mass ($M_{\odot}$)')
+plt.xlabel('log Stellar Mass ($M_{\odot}$)')
+
+cbar = plt.colorbar()
+cbar.set_label('log SFR ($M_{\odot} \; yr^{-1})$')
+
+plt.show()
