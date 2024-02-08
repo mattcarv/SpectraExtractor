@@ -34,9 +34,9 @@ def curve_function(x, a, b, c):
 filtered_df = df[df.LOGMSTAR.apply(np.isfinite) & df.LOGSFR_BEST.apply(np.isfinite)]
 filtered_df_curve = filtered_df[filtered_df.LOGMSTAR < 11.5]
 
-x = filtered_df.LOGMSTAR
-y = filtered_df.LOGSFR_BEST
-params, _ = curve_fit(curve_function, filtered_df_curve.LOGMSTAR, filtered_df_curve.LOGSFR_BEST)
+x = filtered_df_curve.LOGMSTAR
+y = filtered_df_curve.LOGSFR_BEST
+params, _ = curve_fit(curve_function, x, y)
 
 x_fit = np.linspace(min(x), 11.4, 100)
 y_fit = curve_function(x_fit, *params)
@@ -63,9 +63,9 @@ cbar = plt.colorbar(ticks=[7.8,8.8, 9.8, 10.8])
 cbar.set_label('log $t_{dep}\; (yr)$')
 
 # print("Fitted Parameters:")
-# print("a:", params[0])
-# print("b:", params[1])
-# print("c:", params[2])
+print("a:", params[0])
+print("b:", params[1])
+print("c:", params[2])
 plt.show()
 
 
