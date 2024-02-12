@@ -43,53 +43,27 @@ plt.show()
 
 #%%
 # Define a central ellipse to compute the flux.
-#%%
-# BPT Boundaries
 
-a_low = 0.034
-b_low = 1.447
-c_low = -0.986
-
-a_high = 0.885
-b_high = -0.792
-c_high = -6.712
-
-def bptCurveN_O(x, a, b, c):
-    return a + b*x + c*(x**2)
-
-x_values_low = np.linspace(-0.45, 0.29, 400)
-x_values_high = np.linspace(-0.45, -0.12, 400)
-
-
-y_low = bptCurveN_O(x_values_low, a_low, b_low, c_low)
-y_high = bptCurveN_O(x_values_high, a_high, b_high, c_high)
-
-# Plot both curves
-plt.plot(x_values_low, y_low, label='Lower Limit')
-plt.plot(x_values_high, y_high, label='Higher Limit')
-
-plt.xlabel('x')
-plt.ylabel('y')
-plt.title('Plot of Lower and Higher Limits')
-plt.legend()
-plt.grid(True)
-plt.show()
-
-#%%
+#%% BPT Boundaries
+plt.rcParams["figure.figsize"] = [10, 8]
+plt.rcParams.update({'font.size': 18})
 
 # Define the function
-def calculate_y(x):
+def BPT(x):
     return (0.61 / (x - 0.47)) + 1.19
 
 # Generate x values
 x_values = np.linspace(-0.45, 0.29, 100)
 
 # Calculate corresponding y values
-y_values = calculate_y(x_values)
+y_values = BPT(x_values)
 
 # Plot the function
-plt.plot(x_values, y_values)
-plt.xlabel('x')
-plt.ylabel('y')
-plt.grid(True)
+plt.plot(x_values, y_values, c='r')
+plt.text(-0.1, -1, 'STAR-FORMING', fontsize=15)
+plt.text(0.2, 0, 'AGN', fontsize=15)
+plt.xlim(-0.4, 0.3)
+plt.ylim(-2, 0.6)
+plt.xlabel(r'log ($NII\lambda 6584/ H\alpha$)')
+plt.ylabel(r'log ($OIII\lambda 5007/ H\beta$)')
 plt.show()
