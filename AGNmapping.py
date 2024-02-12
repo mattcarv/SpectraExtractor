@@ -49,21 +49,22 @@ plt.rcParams["figure.figsize"] = [10, 8]
 plt.rcParams.update({'font.size': 18})
 
 # Define the function
+# (0.61 / (x - 0.47)) + 1.19
 def BPT(x):
-    return (0.61 / (x - 0.47)) + 1.19
+    return (0.61 / (x - 0.05)) + 1.3
 
 # Generate x values
-x_values = np.linspace(-0.45, 0.29, 100)
+x_values = np.linspace(-1.6, 0, 100)
 
 # Calculate corresponding y values
 y_values = BPT(x_values)
 
 # Plot the function
 plt.plot(x_values, y_values, c='r')
-plt.text(-0.1, -1, 'STAR-FORMING', fontsize=15)
-plt.text(0.2, 0, 'AGN', fontsize=15)
-plt.xlim(-0.4, 0.3)
-plt.ylim(-2, 0.6)
+plt.text(-0.75, -0.5, 'STAR-FORMING', fontsize=15)
+plt.text(0.2, 1, 'AGN', fontsize=15)
+plt.xlim(-1.5, 0.5)
+plt.ylim(-1.2, 1.5)
 plt.xlabel(r'log ($NII\lambda 6584/ H\alpha$)')
 plt.ylabel(r'log ($OIII\lambda 5007/ H\beta$)')
 plt.show()
