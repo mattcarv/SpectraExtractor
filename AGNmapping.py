@@ -5,7 +5,7 @@ from astropy.wcs import WCS
 plt.rcParams["figure.figsize"] = [10, 8]
 plt.rcParams.update({'font.size': 18})
 
-hdul =  fits.open('C:/Users/mathe/Downloads/LUCI Files-20240207T161845Z-001/LUCI Files/RubinsGalaxy_withuncer_finalNOSTOCHS_forpaper_2_NII6583_Flux.fits')
+hdul =  fits.open('C:/Users/mathe/Downloads/LUCI Files-20240207T161845Z-001/LUCI Files/RubinsGalaxy_withuncer_finalNOSTOCHS_forpaper_2_Halpha_Flux.fits')
 data = hdul[0].data
 wcs = WCS(hdul[0].header)
 
@@ -44,7 +44,7 @@ ax.add_patch(ellipse)
 ax.coords['ra'].set_axislabel('Right Ascension (J2000)')
 ax.coords['dec'].set_axislabel('Declination (J2000)')
 
-plt.clf()
+plt.show()
 
 #------------------------------------------------------------------------------
 x, y = np.meshgrid(np.arange(hdul[0].data.shape[1]), np.arange(hdul[0].data.shape[0]))
@@ -116,8 +116,8 @@ ax.view_init(elev=20, azim=30)
 
 plt.show()
 
-# x_peak, y_peak = popt[1], popt[2]
-# print(f"Peak Position (x, y): ({x_peak}, {y_peak})")
+x_peak, y_peak = popt[1], popt[2]
+print(f"Peak Position (x, y): ({x_peak}, {y_peak})")
 
 #%% Holwerda's definition of the central region
 import matplotlib.patches as patches
@@ -145,7 +145,7 @@ ax.add_patch(circle)
 
 ax.coords['ra'].set_axislabel('Right Ascension (J2000)')
 ax.coords['dec'].set_axislabel('Declination (J2000)')
-plt.clf()
+plt.show()
 
 #------------------------------------------------------------------------------
 xc = x - g_circ_center_small[0]
@@ -174,7 +174,7 @@ def gaussian_2d(xy, amplitude, xo, yo, sigma_x, sigma_y, theta, offset):
     return g.ravel()
 
 initial_guess = (1, circle_pixel_data['x'].mean(), circle_pixel_data['y'].mean(),
-                  4, 2, 0, 0)
+                  4, 5, 0, 0)
 popt, _ = curve_fit(gaussian_2d, (circle_pixel_data['x'], circle_pixel_data['y']),
                     circle_pixel_data['value'], p0=initial_guess)
 
@@ -201,10 +201,54 @@ ax.set_zlabel('Pixel Value')
 
 ax.view_init(elev=10, azim=80)
 
-plt.show()
+plt.clf()
 
-# x_peak, y_peak = popt[1], popt[2]
-# print(f"Peak Position (x, y): ({x_peak}, {y_peak})")
+x_peak, y_peak = popt[2], popt[1]
+print(f"Peak Position (x, y): ({x_peak}, {y_peak})")
+
+
+#%% For-loop to run through many files and compute the flux from the same region
+# as defined above: BASED ON HOLWERDA'S CIRCLE
+file_names = [
+    'C:/Users/mathe/Downloads/LUCI Files-20240207T161845Z-001/LUCI Files/Rubin_SN2_FINAL_NOSTOCHS_forpaper_2_OIII5007_Flux.fits',
+    'C:/Users/mathe/Downloads/LUCI Files-20240207T161845Z-001/LUCI Files/Rubin_SN2_FINAL_NOSTOCHS_forpaper_2_Hbeta_Flux.fits',
+    'C:/Users/mathe/Downloads/LUCI Files-20240207T161845Z-001/LUCI Files/RubinsGalaxy_withuncer_finalNOSTOCHS_forpaper_2_NII6583_Flux.fits',
+    'C:/Users/mathe/Downloads/LUCI Files-20240207T161845Z-001/LUCI Files/RubinsGalaxy_withuncer_finalNOSTOCHS_forpaper_2_Halpha_Flux.fits'
+]
+
+list_mean_circ = []
+
+g_circ_center_small = (122.05, 126.35)
+diameter_arcseconds = 6.1
+
+for file_name in file_names:
+    
+    hdul = fits.open(file_name)
+    data = hdul[0].data
+    
+    wcs = WCS(hdul[0].header)
+    
+    pixel_scale = proj_plane_pixel_scales(wcs)[0] * u.deg / u.pixel
+    diameter_degrees = diameter_arcseconds * u.arcsec.to(u.deg)
+    diameter_pixels = (diameter_degrees / pixel_scale).value
+    
+    x, y = np.meshgrid(np.arange(data.shape[1]), np.arange(data.shape[0]))
+    
+    xc = x - g_circ_center_small[0]
+    yc = y - g_circ_center_small[1]
+    rad_cc_circle = (xc**2 + yc**2) <= (diameter_pixels / 2)**2
+    
+    pix_circle = np.sum(rad_cc_circle)
+    pix_circle_values = data[rad_cc_circle]
+    list_mean_circ.append(pix_circle_values.mean())
+    
+# print(list_mean_circ)
+
+logOIII_Hbeta = np.log10(list_mean_circ[0]/list_mean_circ[1])
+logNII_Halpha = np.log10(list_mean_circ[2]/list_mean_circ[3])
+#%%
+# DO THE SAME WITH THE ELLIPSE TO COMPARE
+
 #%% BPT Boundaries (from Kauffmann, 2003)
 plt.rcParams["figure.figsize"] = [10, 8]
 
@@ -221,6 +265,7 @@ y_values = BPT(x_values)
 
 # Plot the function
 plt.plot(x_values, y_values, c='r')
+plt.scatter(logNII_Halpha, logOIII_Hbeta, c='k')
 plt.text(-0.75, -0.5, 'STAR-FORMING', fontsize=15)
 plt.text(0.2, 1, 'AGN', fontsize=15)
 plt.xlim(-1.5, 0.5)
