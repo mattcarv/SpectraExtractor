@@ -21,7 +21,7 @@ ax.coords['dec'].set_axislabel('Declination (J2000)')
 plt.show()
 
 
-#%% Using Bavi's definition of central region
+#%% Using Bavi's definition of central region - ELLIPSE
 import matplotlib.patches as patches
 from astropy.coordinates import SkyCoord
 
@@ -32,7 +32,7 @@ ax.imshow(data, cmap='viridis', origin='lower', vmax=(.001*data.max()))
 # wcs_center = SkyCoord('03h53m02.4811s', '+35d35m22.103s', frame='icrs')
 # g_ell_center_small = wcs.world_to_pixel(wcs_center)
 # x_center, y_center = (125, 128)
-g_ell_center_small = (124, 128)
+g_ell_center_small = (122.05, 126.35)
 g_ell_width_small = 11.743836 * 2
 g_ell_height_small = 7.3121888 * 2
 angle_small = 315.71316
@@ -44,7 +44,7 @@ ax.add_patch(ellipse)
 ax.coords['ra'].set_axislabel('Right Ascension (J2000)')
 ax.coords['dec'].set_axislabel('Declination (J2000)')
 
-plt.show()
+plt.clf()
 
 #------------------------------------------------------------------------------
 x, y = np.meshgrid(np.arange(hdul[0].data.shape[1]), np.arange(hdul[0].data.shape[0]))
@@ -59,13 +59,66 @@ xct = xc * cos_angle - yc * sin_angle
 yct = xc * sin_angle + yc * cos_angle
 
 rad_cc = (xct**2 / (g_ell_width_small / 2.)**2) + (yct**2 / (g_ell_height_small / 2.)**2)
-
 pix_ell = np.sum(rad_cc <= 1.0)
 pix_ell_values = hdul[0].data[rad_cc <= 1.0]
 
 
 print(f"Number of pixels inside the ellipse: {pix_ell}")
-print(pix_ell_values.mean())
+#print(pix_ell_values)
+
+#%% Hist2D
+from scipy.optimize import curve_fit
+plt.rcParams["figure.figsize"] = [15, 15]
+
+ellipse_pixel_data = np.zeros(pix_ell, dtype=[('x', int), ('y', int), ('value', float)])
+ellipse_pixel_data['x'], ellipse_pixel_data['y'] = np.where(rad_cc <= 1.0)
+ellipse_pixel_data['value'] = pix_ell_values
+
+def gaussian_2d(xy, amplitude, xo, yo, sigma_x, sigma_y, theta, offset):
+    x, y = xy
+    xo = float(xo)
+    yo = float(yo)
+    a = (np.cos(theta)**2) / (2 * sigma_x**2) + (np.sin(theta)**2) / (2 * sigma_y**2)
+    b = -(np.sin(2 * theta)) / (4 * sigma_x**2) + (np.sin(2 * theta)) / (4 * sigma_y**2)
+    c = (np.sin(theta)**2) / (2 * sigma_x**2) + (np.cos(theta)**2) / (2 * sigma_y**2)
+    g = offset + amplitude * np.exp(- (a * (x - xo)**2 + 2 * b * (x - xo) * (y - yo) + c * (y - yo)**2))
+    return g.ravel()
+
+initial_guess = (1, ellipse_pixel_data['x'].mean(), ellipse_pixel_data['y'].mean(),
+                  8, 8, 0, 0)
+popt, _ = curve_fit(gaussian_2d, (ellipse_pixel_data['x'], ellipse_pixel_data['y']),
+                    ellipse_pixel_data['value'], p0=initial_guess)
+
+
+x_fit = np.linspace(ellipse_pixel_data['x'].min(), ellipse_pixel_data['x'].max(), 100)
+y_fit = np.linspace(ellipse_pixel_data['y'].min(), ellipse_pixel_data['y'].max(), 100)
+x_fit, y_fit = np.meshgrid(x_fit, y_fit)
+
+z_fit = gaussian_2d((x_fit, y_fit), *popt).reshape(x_fit.shape)
+
+
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+
+# Plot the 3D surface
+ax.plot_trisurf(ellipse_pixel_data['x'], ellipse_pixel_data['y'], ellipse_pixel_data['value'],
+                cmap='plasma', edgecolor='k', alpha=0.5)
+
+ax.plot_surface(x_fit, y_fit, z_fit, color='green', alpha=0.3)
+
+# Set axis labels
+ax.set_xlabel('X Pixel')
+ax.set_ylabel('Y Pixel')
+ax.set_zlabel('Pixel Value')
+
+ax.view_init(elev=20, azim=30)
+
+
+plt.show()
+
+# x_peak, y_peak = popt[1], popt[2]
+# print(f"Peak Position (x, y): ({x_peak}, {y_peak})")
+
 #%% Holwerda's definition of the central region
 import matplotlib.patches as patches
 from astropy.wcs.utils import proj_plane_pixel_scales
@@ -77,7 +130,7 @@ ax.imshow(data, cmap='viridis', origin='lower', vmax=(.001*data.max()))
 
 # wcs_center = SkyCoord('03h53m02.4811s', '+35d35m22.103s', frame='icrs')
 # g_ell_center_small = wcs.world_to_pixel(wcs_center)
-g_circ_center_small = (124, 128)
+g_circ_center_small = (122.05, 126.35)
 
 diameter_arcseconds = 6.1
 
@@ -92,7 +145,7 @@ ax.add_patch(circle)
 
 ax.coords['ra'].set_axislabel('Right Ascension (J2000)')
 ax.coords['dec'].set_axislabel('Declination (J2000)')
-plt.show()
+plt.clf()
 
 #------------------------------------------------------------------------------
 xc = x - g_circ_center_small[0]
@@ -106,20 +159,54 @@ pix_circle_values = data[rad_cc_circle]
 print(f"Number of pixels inside the circle: {pix_circle}")
 print(pix_circle_values.mean())
 #%%
+circle_pixel_data = np.zeros(pix_circle, dtype=[('x', int), ('y', int), ('value', float)])
+circle_pixel_data['x'], circle_pixel_data['y'] = np.where(rad_cc_circle)
+circle_pixel_data['value'] = pix_circle_values
 
-plt.hist(pix_ell_values, bins=100)
-plt.xlabel('Flux')
-plt.ylabel('Count')
+def gaussian_2d(xy, amplitude, xo, yo, sigma_x, sigma_y, theta, offset):
+    x, y = xy
+    xo = float(xo)
+    yo = float(yo)
+    a = (np.cos(theta)**2) / (2 * sigma_x**2) + (np.sin(theta)**2) / (2 * sigma_y**2)
+    b = -(np.sin(2 * theta)) / (4 * sigma_x**2) + (np.sin(2 * theta)) / (4 * sigma_y**2)
+    c = (np.sin(theta)**2) / (2 * sigma_x**2) + (np.cos(theta)**2) / (2 * sigma_y**2)
+    g = offset + amplitude * np.exp(- (a * (x - xo)**2 + 2 * b * (x - xo) * (y - yo) + c * (y - yo)**2))
+    return g.ravel()
+
+initial_guess = (1, circle_pixel_data['x'].mean(), circle_pixel_data['y'].mean(),
+                  4, 2, 0, 0)
+popt, _ = curve_fit(gaussian_2d, (circle_pixel_data['x'], circle_pixel_data['y']),
+                    circle_pixel_data['value'], p0=initial_guess)
+
+
+x_fit = np.linspace(circle_pixel_data['x'].min(), circle_pixel_data['x'].max(), 100)
+y_fit = np.linspace(circle_pixel_data['y'].min(), circle_pixel_data['y'].max(), 100)
+x_fit, y_fit = np.meshgrid(x_fit, y_fit)
+
+z_fit = gaussian_2d((x_fit, y_fit), *popt).reshape(x_fit.shape)
+
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+
+# Plot the 3D surface
+ax.plot_trisurf(circle_pixel_data['x'], circle_pixel_data['y'], circle_pixel_data['value'],
+                cmap='plasma', edgecolor='k', alpha=0.5)
+
+# Plot the fitted Gaussian surface
+ax.plot_surface(x_fit, y_fit, z_fit, color='green', alpha=0.3)
+
+ax.set_xlabel('X Pixel')
+ax.set_ylabel('Y Pixel')
+ax.set_zlabel('Pixel Value')
+
+ax.view_init(elev=10, azim=80)
+
 plt.show()
 
-#%%
-
-plt.hist(pix_circle_values, bins=100)
-plt.xlabel('Flux')
-plt.ylabel('Count')
-plt.show()
-
+# x_peak, y_peak = popt[1], popt[2]
+# print(f"Peak Position (x, y): ({x_peak}, {y_peak})")
 #%% BPT Boundaries (from Kauffmann, 2003)
+plt.rcParams["figure.figsize"] = [10, 8]
 
 # Define the function
 # (0.61 / (x - 0.47)) + 1.19
