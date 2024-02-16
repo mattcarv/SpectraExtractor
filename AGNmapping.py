@@ -214,7 +214,8 @@ file_names = [
     'C:/Users/mathe/Downloads/LUCI Files-20240207T161845Z-001/LUCI Files/Rubin_SN2_FINAL_NOSTOCHS_forpaper_2_Hbeta_Flux.fits',
     'C:/Users/mathe/Downloads/LUCI Files-20240207T161845Z-001/LUCI Files/RubinsGalaxy_withuncer_finalNOSTOCHS_forpaper_2_NII6583_Flux.fits',
     'C:/Users/mathe/Downloads/LUCI Files-20240207T161845Z-001/LUCI Files/RubinsGalaxy_withuncer_finalNOSTOCHS_forpaper_2_Halpha_Flux.fits',
-    'C:/Users/mathe/Downloads/LUCI Files-20240207T161845Z-001/LUCI Files/RubinsGalaxy_withuncer_finalNOSTOCHS_forpaper_2_SII6716_Flux.fits'
+    'C:/Users/mathe/Downloads/LUCI Files-20240207T161845Z-001/LUCI Files/RubinsGalaxy_withuncer_finalNOSTOCHS_forpaper_2_SII6716_Flux.fits',
+    'C:/Users/mathe/Downloads/LUCI Files-20240207T161845Z-001/LUCI Files/RubinsGalaxy_withuncer_finalNOSTOCHS_forpaper_2_SII6731_Flux.fits'
 ]
 
 list_mean_circ = []
@@ -253,7 +254,7 @@ print(list_mean_circ)
 
 logOIII_Hbeta_circ = np.log10(list_mean_circ[0]/list_mean_circ[1])
 logNII_Halpha_circ = np.log10(list_mean_circ[2]/list_mean_circ[3])
-logSII_Halpha_circ = np.log10(list_mean_circ[4]/list_mean_circ[3])
+logSII_Halpha_circ = np.log10((list_mean_circ[4]+list_mean_circ[5])/list_mean_circ[3])
 #%%
 # DO THE SAME WITH THE ELLIPSE TO COMPARE
 list_mean_ell = []
@@ -296,9 +297,9 @@ print(list_mean_ell)
 
 logOIII_Hbeta_ell = np.log10(list_mean_ell[0]/list_mean_ell[1])
 logNII_Halpha_ell = np.log10(list_mean_ell[2]/list_mean_ell[3])
-logSII_Halpha_ell = np.log10(list_mean_ell[4]/list_mean_ell[3])
+logSII_Halpha_ell = np.log10((list_mean_ell[4]+list_mean_ell[5])/list_mean_circ[3])
 
-#%% BPT Boundaries (from Kauffmann, 2003) FOR OIII/HBETA VERSUS NII/HALPHA
+#%% BPT Boundaries (from KEWLEY, 2006) FOR OIII/HBETA VERSUS NII/HALPHA
 plt.rcParams["figure.figsize"] = [10, 8]
 
 # Define the function
@@ -306,20 +307,27 @@ plt.rcParams["figure.figsize"] = [10, 8]
 def BPT_NII(x):
     return (0.61 / (x - 0.05)) + 1.3
 
+def BPT_NII_Comp(x):
+    return (0.61 / (x - 0.47)) + 1.19
+
 # Generate x values
 x_values = np.linspace(-1.6, 0, 100)
+x_values_comp = np.linspace(-1.6, 0.25, 100)
 
 # Calculate corresponding y values
 y_values = BPT_NII(x_values)
+y_values_comp = BPT_NII_Comp(x_values_comp)
 
 # Plot the function
-plt.plot(x_values, y_values, c='k', linestyle='--')
-plt.scatter(logNII_Halpha_circ, logOIII_Hbeta_circ, c='r', marker='^', s=100,
-            label='Circle (from KPNO\'s observation: 6.1 arcsec')
-plt.scatter(logNII_Halpha_ell, logOIII_Hbeta_ell, c='k', marker='^', s=100,
+plt.plot(x_values, y_values, c='k', linestyle='-')
+plt.plot(x_values_comp, y_values_comp, c='k', linestyle='--')
+plt.scatter(logNII_Halpha_circ, logOIII_Hbeta_circ, c='r', marker='d', s=100,
+            label='Circle')
+plt.scatter(logNII_Halpha_ell, logOIII_Hbeta_ell, c='k', marker='d', s=100,
             label='Ellipse')
-plt.text(-0.75, -0.5, 'STAR-FORMING', fontsize=15)
-plt.text(0.2,0.6, 'AGN', fontsize=15)
+plt.text(-1.15, -0.3, 'STAR-FORMING', fontsize=15)
+plt.text(0,0.8, 'AGN', fontsize=15)
+plt.text(-0.2, -0.7, 'Composite', fontsize=15)
 plt.xlim(-1.5, 0.5)
 plt.ylim(-1.2, 1.5)
 plt.xlabel(r'log ($NII\lambda 6584/ H\alpha$)')
@@ -328,29 +336,35 @@ plt.ylabel(r'log ($OIII\lambda 5007/ H\beta$)')
 plt.legend(loc=2)
 plt.show()
 
-#%% (KEWLEY, 2001) FOR OIII/HBETA VERSUS SII/HALPHA
+#%% (KEWLEY, 2006) FOR OIII/HBETA VERSUS SII/HALPHA
 
 # Define the function
 def BPT_SII(x):
     return (0.72 / (x - 0.32)) + 1.3
 
+def BPT_SII_LINER(x):
+    return (1.89*x) + 0.76
+
 # Generate x values
 x_values = np.linspace(-1.6, 0.15, 100)
-
+x_values_liner = np.linspace(-0.31, 0.6, 100)
 # Calculate corresponding y values
 y_values = BPT_SII(x_values)
+y_values_liner = BPT_SII_LINER(x_values_liner)
 
 # Plot the function
 plt.plot(x_values, y_values, c='k', linestyle='--')
-plt.scatter(logSII_Halpha_circ, logOIII_Hbeta_circ, c='r', marker='^', s=100,
-            label='Circle (from KPNO\'s observation: 6.1 arcsec')
-plt.scatter(logSII_Halpha_ell, logOIII_Hbeta_ell, c='k', marker='^', s=100,
+plt.plot(x_values_liner, y_values_liner, c='k', linestyle='--')
+plt.scatter(logSII_Halpha_circ, logOIII_Hbeta_circ, c='r', marker='d', s=100,
+            label='Circle')
+plt.scatter(logSII_Halpha_ell, logOIII_Hbeta_ell, c='k', marker='d', s=100,
             label='Ellipse')
-plt.text(-0.75, -0.5, 'STAR-FORMING', fontsize=15)
-plt.text(0.2,0.6, 'AGN', fontsize=15)
+plt.text(-1.15, -0.3, 'STAR-FORMING', fontsize=15)
+plt.text(0.2, -0.2, 'LINER', fontsize=15)
+plt.text(-0.7, 1, 'Seyfert', fontsize=15)
 plt.xlim(-1.5, 0.5)
 plt.ylim(-1.2, 1.5)
-plt.xlabel(r'log ($SII\lambda 6717/ H\alpha$)')
+plt.xlabel(r'log ($SII\lambda \lambda 6716, 31/ H\alpha$)')
 plt.ylabel(r'log ($OIII\lambda 5007/ H\beta$)')
 
 plt.legend(loc=2)
