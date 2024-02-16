@@ -116,7 +116,7 @@ ax.view_init(elev=20, azim=30)
 
 plt.show()
 
-x_peak, y_peak = popt[1], popt[2]
+x_peak, y_peak = popt[2], popt[1]
 print(f"Peak Position (x, y): ({x_peak}, {y_peak})")
 
 #%% Holwerda's definition of the central region
@@ -188,7 +188,6 @@ z_fit = gaussian_2d((x_fit, y_fit), *popt).reshape(x_fit.shape)
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
 
-# Plot the 3D surface
 ax.plot_trisurf(circle_pixel_data['x'], circle_pixel_data['y'], circle_pixel_data['value'],
                 cmap='plasma', edgecolor='k', alpha=0.5)
 
@@ -219,8 +218,6 @@ file_names = [
 ]
 
 list_mean_circ = []
-
-
 
 def FluxCalc (data):
     g_circ_center_small = (122.05, 126.35)
@@ -258,8 +255,6 @@ logSII_Halpha_circ = np.log10((list_mean_circ[4]+list_mean_circ[5])/list_mean_ci
 #%%
 # DO THE SAME WITH THE ELLIPSE TO COMPARE
 list_mean_ell = []
-
-
 
 def FluxCalc (data):
     g_ell_center_small = (122.05, 126.35)
@@ -302,23 +297,18 @@ logSII_Halpha_ell = np.log10((list_mean_ell[4]+list_mean_ell[5])/list_mean_circ[
 #%% BPT Boundaries (from KEWLEY, 2006) FOR OIII/HBETA VERSUS NII/HALPHA
 plt.rcParams["figure.figsize"] = [10, 8]
 
-# Define the function
-# (0.61 / (x - 0.47)) + 1.19
 def BPT_NII(x):
     return (0.61 / (x - 0.05)) + 1.3
 
 def BPT_NII_Comp(x):
     return (0.61 / (x - 0.47)) + 1.19
 
-# Generate x values
 x_values = np.linspace(-1.6, 0, 100)
 x_values_comp = np.linspace(-1.6, 0.25, 100)
 
-# Calculate corresponding y values
 y_values = BPT_NII(x_values)
 y_values_comp = BPT_NII_Comp(x_values_comp)
 
-# Plot the function
 plt.plot(x_values, y_values, c='k', linestyle='-')
 plt.plot(x_values_comp, y_values_comp, c='k', linestyle='--')
 plt.scatter(logNII_Halpha_circ, logOIII_Hbeta_circ, c='r', marker='d', s=100,
@@ -337,18 +327,15 @@ plt.legend(loc=2)
 plt.show()
 
 #%% (KEWLEY, 2006) FOR OIII/HBETA VERSUS SII/HALPHA
-
-# Define the function
 def BPT_SII(x):
     return (0.72 / (x - 0.32)) + 1.3
 
 def BPT_SII_LINER(x):
     return (1.89*x) + 0.76
 
-# Generate x values
 x_values = np.linspace(-1.6, 0.15, 100)
 x_values_liner = np.linspace(-0.31, 0.6, 100)
-# Calculate corresponding y values
+
 y_values = BPT_SII(x_values)
 y_values_liner = BPT_SII_LINER(x_values_liner)
 
