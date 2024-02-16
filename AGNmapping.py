@@ -5,7 +5,7 @@ from astropy.wcs import WCS
 plt.rcParams["figure.figsize"] = [10, 8]
 plt.rcParams.update({'font.size': 18})
 
-hdul =  fits.open('C:/Users/mathe/Downloads/LUCI Files-20240207T161845Z-001/LUCI Files/RubinsGalaxy_withuncer_finalNOSTOCHS_forpaper_2_Halpha_Flux.fits')
+hdul =  fits.open('C:/Users/mathe/Downloads/LUCI Files-20240207T161845Z-001/LUCI Files/RubinsGalaxy_withuncer_finalNOSTOCHS_forpaper_2_SII6716_Flux.fits')
 data = hdul[0].data
 wcs = WCS(hdul[0].header)
 
@@ -201,7 +201,7 @@ ax.set_zlabel('Pixel Value')
 
 ax.view_init(elev=10, azim=80)
 
-plt.clf()
+plt.show()
 
 x_peak, y_peak = popt[2], popt[1]
 print(f"Peak Position (x, y): ({x_peak}, {y_peak})")
@@ -213,21 +213,17 @@ file_names = [
     'C:/Users/mathe/Downloads/LUCI Files-20240207T161845Z-001/LUCI Files/Rubin_SN2_FINAL_NOSTOCHS_forpaper_2_OIII5007_Flux.fits',
     'C:/Users/mathe/Downloads/LUCI Files-20240207T161845Z-001/LUCI Files/Rubin_SN2_FINAL_NOSTOCHS_forpaper_2_Hbeta_Flux.fits',
     'C:/Users/mathe/Downloads/LUCI Files-20240207T161845Z-001/LUCI Files/RubinsGalaxy_withuncer_finalNOSTOCHS_forpaper_2_NII6583_Flux.fits',
-    'C:/Users/mathe/Downloads/LUCI Files-20240207T161845Z-001/LUCI Files/RubinsGalaxy_withuncer_finalNOSTOCHS_forpaper_2_Halpha_Flux.fits'
+    'C:/Users/mathe/Downloads/LUCI Files-20240207T161845Z-001/LUCI Files/RubinsGalaxy_withuncer_finalNOSTOCHS_forpaper_2_Halpha_Flux.fits',
+    'C:/Users/mathe/Downloads/LUCI Files-20240207T161845Z-001/LUCI Files/RubinsGalaxy_withuncer_finalNOSTOCHS_forpaper_2_SII6716_Flux.fits'
 ]
 
 list_mean_circ = []
 
-g_circ_center_small = (122.05, 126.35)
-diameter_arcseconds = 6.1
 
-for file_name in file_names:
-    
-    hdul = fits.open(file_name)
-    data = hdul[0].data
-    
-    wcs = WCS(hdul[0].header)
-    
+
+def FluxCalc (data):
+    g_circ_center_small = (122.05, 126.35)
+    diameter_arcseconds = 6.1
     pixel_scale = proj_plane_pixel_scales(wcs)[0] * u.deg / u.pixel
     diameter_degrees = diameter_arcseconds * u.arcsec.to(u.deg)
     diameter_pixels = (diameter_degrees / pixel_scale).value
@@ -238,38 +234,124 @@ for file_name in file_names:
     yc = y - g_circ_center_small[1]
     rad_cc_circle = (xc**2 + yc**2) <= (diameter_pixels / 2)**2
     
-    pix_circle = np.sum(rad_cc_circle)
-    pix_circle_values = data[rad_cc_circle]
-    list_mean_circ.append(pix_circle_values.mean())
+    # pix_circle = np.sum(rad_cc_circle)
     
-# print(list_mean_circ)
+    pix_circle_values = data[rad_cc_circle]
+    
+    return(pix_circle_values.mean())
 
-logOIII_Hbeta = np.log10(list_mean_circ[0]/list_mean_circ[1])
-logNII_Halpha = np.log10(list_mean_circ[2]/list_mean_circ[3])
+for file_name in file_names:
+    
+    hdul = fits.open(file_name)
+    data = hdul[0].data
+    
+    wcs = WCS(hdul[0].header)
+    
+    list_mean_circ.append(FluxCalc(data))
+    
+print(list_mean_circ)
+
+logOIII_Hbeta_circ = np.log10(list_mean_circ[0]/list_mean_circ[1])
+logNII_Halpha_circ = np.log10(list_mean_circ[2]/list_mean_circ[3])
+logSII_Halpha_circ = np.log10(list_mean_circ[4]/list_mean_circ[3])
 #%%
 # DO THE SAME WITH THE ELLIPSE TO COMPARE
+list_mean_ell = []
 
-#%% BPT Boundaries (from Kauffmann, 2003)
+
+
+def FluxCalc (data):
+    g_ell_center_small = (122.05, 126.35)
+    g_ell_width_small = 11.743836 * 2
+    g_ell_height_small = 7.3121888 * 2
+    angle_small = 315.71316
+    
+    x, y = np.meshgrid(np.arange(hdul[0].data.shape[1]), np.arange(hdul[0].data.shape[0]))
+
+    cos_angle = np.cos(np.radians(180. - angle_small))
+    sin_angle = np.sin(np.radians(180. - angle_small))
+
+    xc = x - g_ell_center_small[0]
+    yc = y - g_ell_center_small[1]
+
+    xct = xc * cos_angle - yc * sin_angle
+    yct = xc * sin_angle + yc * cos_angle
+
+    rad_cc = (xct**2 / (g_ell_width_small / 2.)**2) + (yct**2 / (g_ell_height_small / 2.)**2)
+    #pix_ell = np.sum(rad_cc <= 1.0)
+    pix_ell_values = hdul[0].data[rad_cc <= 1.0]
+    
+    return(pix_ell_values.mean())
+
+for file_name in file_names:
+    
+    hdul = fits.open(file_name)
+    data = hdul[0].data
+    
+    wcs = WCS(hdul[0].header)
+    
+    list_mean_ell.append(FluxCalc(data))
+    
+print(list_mean_ell)
+
+logOIII_Hbeta_ell = np.log10(list_mean_ell[0]/list_mean_ell[1])
+logNII_Halpha_ell = np.log10(list_mean_ell[2]/list_mean_ell[3])
+logSII_Halpha_ell = np.log10(list_mean_ell[4]/list_mean_ell[3])
+
+#%% BPT Boundaries (from Kauffmann, 2003) FOR OIII/HBETA VERSUS NII/HALPHA
 plt.rcParams["figure.figsize"] = [10, 8]
 
 # Define the function
 # (0.61 / (x - 0.47)) + 1.19
-def BPT(x):
+def BPT_NII(x):
     return (0.61 / (x - 0.05)) + 1.3
 
 # Generate x values
 x_values = np.linspace(-1.6, 0, 100)
 
 # Calculate corresponding y values
-y_values = BPT(x_values)
+y_values = BPT_NII(x_values)
 
 # Plot the function
-plt.plot(x_values, y_values, c='r')
-plt.scatter(logNII_Halpha, logOIII_Hbeta, c='k')
+plt.plot(x_values, y_values, c='k', linestyle='--')
+plt.scatter(logNII_Halpha_circ, logOIII_Hbeta_circ, c='r', marker='^', s=100,
+            label='Circle (from KPNO\'s observation: 6.1 arcsec')
+plt.scatter(logNII_Halpha_ell, logOIII_Hbeta_ell, c='k', marker='^', s=100,
+            label='Ellipse')
 plt.text(-0.75, -0.5, 'STAR-FORMING', fontsize=15)
-plt.text(0.2, 1, 'AGN', fontsize=15)
+plt.text(0.2,0.6, 'AGN', fontsize=15)
 plt.xlim(-1.5, 0.5)
 plt.ylim(-1.2, 1.5)
 plt.xlabel(r'log ($NII\lambda 6584/ H\alpha$)')
 plt.ylabel(r'log ($OIII\lambda 5007/ H\beta$)')
+
+plt.legend(loc=2)
+plt.show()
+
+#%% (KEWLEY, 2001) FOR OIII/HBETA VERSUS SII/HALPHA
+
+# Define the function
+def BPT_SII(x):
+    return (0.72 / (x - 0.32)) + 1.3
+
+# Generate x values
+x_values = np.linspace(-1.6, 0.15, 100)
+
+# Calculate corresponding y values
+y_values = BPT_SII(x_values)
+
+# Plot the function
+plt.plot(x_values, y_values, c='k', linestyle='--')
+plt.scatter(logSII_Halpha_circ, logOIII_Hbeta_circ, c='r', marker='^', s=100,
+            label='Circle (from KPNO\'s observation: 6.1 arcsec')
+plt.scatter(logSII_Halpha_ell, logOIII_Hbeta_ell, c='k', marker='^', s=100,
+            label='Ellipse')
+plt.text(-0.75, -0.5, 'STAR-FORMING', fontsize=15)
+plt.text(0.2,0.6, 'AGN', fontsize=15)
+plt.xlim(-1.5, 0.5)
+plt.ylim(-1.2, 1.5)
+plt.xlabel(r'log ($SII\lambda 6717/ H\alpha$)')
+plt.ylabel(r'log ($OIII\lambda 5007/ H\beta$)')
+
+plt.legend(loc=2)
 plt.show()
