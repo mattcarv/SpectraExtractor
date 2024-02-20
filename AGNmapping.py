@@ -5,7 +5,7 @@ from astropy.wcs import WCS
 plt.rcParams["figure.figsize"] = [10, 8]
 plt.rcParams.update({'font.size': 18})
 
-hdul =  fits.open('C:/Users/mathe/Downloads/LUCI Files-20240207T161845Z-001/LUCI Files/RubinsGalaxy_withuncer_finalNOSTOCHS_forpaper_2_SII6716_Flux.fits')
+hdul =  fits.open('C:/Users/mathe/Downloads/LUCI Files-20240207T161845Z-001/LUCI Files/RubinsGalaxy_withuncer_finalNOSTOCHS_forpaper_2_Halpha_Flux.fits')
 data = hdul[0].data
 wcs = WCS(hdul[0].header)
 
