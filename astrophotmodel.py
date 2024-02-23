@@ -42,15 +42,15 @@ plt.show()
 fig10, ax10 = plt.subplots(figsize = (8,8))
 ap.plots.galaxy_light_profile(fig10, ax10, model3)
 ap.plots.radial_median_profile(fig10, ax10, model3)
-plt.clf()
+plt.show()
 
-# result.update_uncertainty()
-# for P in model3.parameters:
-#     print(f"parameter {P.name} is: {P.value.detach().cpu().tolist()} +- {P.uncertainty.detach().cpu().tolist()}")
+result.update_uncertainty()
+for P in model3.parameters:
+    print(f"parameter {P.name} is: {P.value.detach().cpu().tolist()} +- {P.uncertainty.detach().cpu().tolist()}")
     
     
-# fig, ax = ap.plots.covariance_matrix(result.covariance_matrix.detach().cpu().numpy(), 
-#                                       model3.parameters.get_vector().detach().cpu().numpy(), 
-#                                       model3.parameters.get_name_vector()
-# )
-# plt.show()
+fig, ax = ap.plots.covariance_matrix(result.covariance_matrix.detach().cpu().numpy(), 
+                                      model3.parameters.get_vector().detach().cpu().numpy(), 
+                                      model3.parameters.get_name_vector()
+)
+plt.show()
