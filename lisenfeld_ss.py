@@ -34,9 +34,9 @@ y_dotted = curve_function(x_fit, params[0], params[1], params[2])
 
 plt.scatter(df.logMstar, df.logSFR, c=df.logMmolMstar, cmap='PuBu')
 plt.text(11.63, 0.25, 'UGC 2885', c='black', fontsize=12)
-plt.plot(x_fit, y_fit, 'k', linewidth=2)
-plt.plot(x_fit, y_dotted+0.4, 'k-.', linewidth=1)
-plt.plot(x_fit, y_dotted-0.4, 'k-.', linewidth=1)
+# plt.plot(x_fit, y_fit, 'k', linewidth=2)
+# plt.plot(x_fit, y_dotted+0.4, 'k-.', linewidth=1)
+# plt.plot(x_fit, y_dotted-0.4, 'k-.', linewidth=1)
 plt.ylabel('log SFR ($M_{\odot} \; yr^{-1}$)')
 plt.xlabel('log Stellar Mass ($M_{\odot}$)')
 
