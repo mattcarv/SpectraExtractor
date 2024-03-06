@@ -6,12 +6,12 @@ from astropy import units as u
 import numpy as np
 
 
-hdul = fits.open('/home/mdocarm/Downloads/PROJECTUGC2885-2022/CO-files-20221207T192945Z-001/moment0finalreal.fits')
+hdul = fits.open('/home/mdocarm/Downloads/PROJECTUGC2885-2022/montage/UGC2885FILES-part1/projectedwise1.fits')
 header = hdul[0].header
 data = hdul[0].data
 wcs = WCS(hdul[0].header)
 
-hdul2 = fits.open('/home/mdocarm/Downloads/PROJECTUGC2885-2022/CO-files-20221207T192945Z-001/CO-files/projected_deidre.fits')
+hdul2 = fits.open('/home/mdocarm/Downloads/PROJECTUGC2885-2022/montage/UGC2885FILES-part1/projectedwise4.fits')
 data2 = hdul2[0].data
 plt.rcParams.update({'font.size': 18})
 plt.rcParams["figure.figsize"] = (10,8)
@@ -49,4 +49,44 @@ plt.subplots_adjust(left=0.15,
                     top=0.9,
                     wspace=0.6,
                     hspace=0)
+plt.show()
+
+
+#%%
+
+# Load FITS data
+hdul = fits.open('/home/mdocarm/Downloads/PROJECTUGC2885-2022/CO-files-20221207T192945Z-001/moment0final.fits')
+header = hdul[0].header
+data = hdul[0].data
+wcs = WCS(header)
+
+plt.rcParams.update({'font.size': 18})
+plt.rcParams["figure.figsize"] = (10, 8)
+
+pixel_scale = proj_plane_pixel_scales(wcs)[0] * u.deg / u.pixel
+arcmin = 1 * u.arcmin.to(u.deg)
+arcmin_pixel = (arcmin / pixel_scale).value
+
+fig, ax = plt.subplots(subplot_kw={'projection': wcs}, figsize=(10, 8))
+
+# Plot the moment map
+im1 = plt.imshow(data, origin='lower', cmap='winter')
+
+circ_radius = 13.3*u.arcsec
+conv_circ = circ_radius.to(u.deg)
+circ_pixel = (conv_circ/pixel_scale).value
+
+circle = plt.Circle((58, 8), circ_pixel, color='red', fill=False, 
+                    lw=1, ls='--')
+ax.add_patch(circle)
+plt.plot([6, 6 + arcmin_pixel], [6, 6], color='black', lw=2)
+plt.text(6 + arcmin_pixel / 2, 8, '1 arcmin', color='black', ha='center', va='bottom', fontsize=16)
+plt.grid(color='black', lw=0.5, alpha=0.5)
+
+cbar1 = fig.colorbar(im1, spacing='proportional')
+cbar1.set_label('Integrated Intensity (K Km s$^{-1}$)')
+
+ax.coords['ra'].set_axislabel('Right Ascension (J2000)')
+ax.coords['dec'].set_axislabel('Declination (J2000)')
+
 plt.show()
