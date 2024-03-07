@@ -6,12 +6,12 @@ from astropy import units as u
 from matplotlib.patches import Rectangle
 
 
-hdul = fits.open('/home/mdocarm/Downloads/PROJECTUGC2885-2022/U2885-HI/projected_deidre.fits')
+hdul = fits.open('C:/Users/mathe/OneDrive/Documents/GitHub/U2885_files/projected_deidre.fits')
 header = hdul[0].header
-data = hdul[0].data/1000
+data = hdul[0].data
 wcs = WCS(hdul[0].header)
 
-hdul2 = fits.open('/home/mdocarm/Downloads/PROJECTUGC2885-2022/CO-files-20221207T192945Z-001/moment0finalreal.fits')
+hdul2 = fits.open('C:/Users/mathe/OneDrive/Documents/GitHub/U2885_files/moment0final.fits')
 data2 = hdul2[0].data
 plt.rcParams.update({'font.size': 18})
 plt.rcParams["figure.figsize"] = (10,8)
@@ -22,14 +22,22 @@ arcmin_pixel = (arcmin / pixel_scale).value
 
 fig, ax = plt.subplots(subplot_kw={'projection': wcs}, 
                                figsize=(10, 8))
-ax.add_patch(Rectangle((1, 49), 68, 25, edgecolor='blue', fill=False,
-                       angle=-44.97, alpha=0.5))
+
+circ_radius = 13.3*u.arcsec
+conv_circ = circ_radius.to(u.deg)
+circ_pixel = (conv_circ/pixel_scale).value
+circle = plt.Circle((63, 64), circ_pixel, color='red', fill=False, 
+                    lw=1, ls='--')
+ax.add_patch(circle)
+ax.add_patch(Rectangle((1, 49), 68, 25, edgecolor='blue',ls='--', fill=False,
+                       angle=-44.97, alpha=0.7))
+
 im1 = plt.imshow(data2, origin='lower', cmap='winter')
 im2 = plt.contour(data, origin='lower', cmap='PuRd', alpha=0.9, vmin=0)
 plt.plot([6, 6 + arcmin_pixel], [6, 6], color='black', lw=2)
 plt.text(6 + arcmin_pixel / 2, 8, '1 arcmin', color='black',
          ha='center', va='bottom', fontsize=16)
-plt.grid(color='black', lw=0.5, alpha=0.5)
+plt.grid(color='black', lw=0.5, alpha=0.3)
 plt.text(18, 84, 'Integrated Flux ($K\; km\; s^{-1}$)')
 
 
@@ -39,7 +47,7 @@ cbar1.ax.tick_params(direction='out', labeltop=True, labelbottom=False, top=True
 
 cax2 = fig.add_axes([0.9, 0.1, 0.025, 0.8])
 cbar2 = fig.colorbar(im2, cax=cax2, pad=0.01)
-cbar2.set_label('Integrated Flux ($Jy\; beam^{-1} \; m\; s^{-1}$)')
+cbar2.set_label('Integrated Flux ($Jy\; beam^{-1} \; km\; s^{-1}$)')
 
 
 ax.coords['ra'].set_axislabel('Right Ascension (J2000)')

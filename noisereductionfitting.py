@@ -31,7 +31,7 @@ for i in range(num_slices):
 modified_cube = SpectralCube(data=np.array(modified_slices), wcs=cube_original.wcs, 
                              mask=None, meta=None)
 
-modified_cube.write('modifiedcube.fits', overwrite=True)
+#modified_cube.write('modifiedcube.fits', overwrite=True)
 
 filename = fits.open('modifiedcube.fits')
 
@@ -49,12 +49,18 @@ peak_intensity = cube.max(axis=0)
 pixel_scale = proj_plane_pixel_scales(wcs)[0] * u.deg / u.pixel
 arcmin = 1 * u.arcmin.to(u.deg)
 arcmin_pixel = (arcmin / pixel_scale).value
+circ_radius = 13.3*u.arcsec
+conv_circ = circ_radius.to(u.deg)
+circ_pixel = (conv_circ/pixel_scale).value
+circle = plt.Circle((62, 64), circ_pixel, color='red', fill=False, 
+                    lw=1, ls='--')
 
 
 plt.figure(figsize=(10,8))
 ax = plt.subplot(projection=peak_intensity.wcs)
-ax.grid(True)
-im = ax.imshow(peak_intensity.value, origin='lower', cmap='viridis', vmax=0.15)
+ax.add_patch(circle)
+ax.grid(True, color='k', lw=0.5, alpha=0.3)
+im = ax.imshow(peak_intensity.value, origin='lower', cmap='viridis', vmax=0.12)
 ax.plot([6, 6 + arcmin_pixel], [6, 6], color='black', lw=2)
 ax.text(6 + arcmin_pixel / 2, 8, '1 arcmin', color='black',
           ha='center', va='bottom', fontsize=16)
@@ -79,10 +85,10 @@ plt.ylim([0.007, 0.015])
 plt.axhline(0.0096, linestyle='--', color='k', linewidth=3, 
             label='Average level of $\sigma$')
 plt.legend(frameon=True)
-plt.clf()
+plt.show()
 
-# Clip values above 3-sigma
-cube_sclip = cube.sigma_clip_spectrally(3) 
+# Clip values above 2-sigma
+cube_sclip = cube.sigma_clip_spectrally(2) 
 
 mad_std_spectrum_sclip = cube_sclip.mad_std(axis=(1, 2))
 
@@ -91,11 +97,11 @@ plt.xlabel('Velocity (km/s)')
 plt.ylabel(r' Noise standard deviation $\sigma$ (K)')
 print(np.mean(mad_std_spectrum_sclip))
 # Best to extend the range to 0.
-plt.ylim([0.007, 0.015])
+plt.ylim([0.007, 0.010])
 
 plt.axhline(0.0081, linestyle='--', color='k', linewidth=3, label='Average noise level')
 plt.legend(frameon=True)
-plt.clf()
+plt.show()
 #%% Here we display the noise map - notice the edge effects from the observation
 
 mad_std_map_sclip = cube_sclip.mad_std(axis=0) # Calculate sigma along the spectral dimension
@@ -104,18 +110,24 @@ mad_std_map_sclip = cube_sclip.mad_std(axis=0) # Calculate sigma along the spect
 
 plt.figure(figsize=(10,8))
 ax = plt.subplot(projection=mad_std_map_sclip.wcs)
-ax.grid(True)
-im = ax.imshow(mad_std_map_sclip.value, origin='lower', cmap='viridis', vmax=0.15)
+ax.grid(True, color='k', lw=0.5, alpha=0.3)
+im = ax.imshow(mad_std_map_sclip.value, origin='lower', cmap='viridis', vmax=0.12)
 ax.plot([6, 6 + arcmin_pixel], [6, 6], color='black', lw=2)
 ax.text(6 + arcmin_pixel / 2, 8, '1 arcmin', color='black',
           ha='center', va='bottom', fontsize=16)
+circ_radius = 13.3*u.arcsec
+conv_circ = circ_radius.to(u.deg)
+circ_pixel = (conv_circ/pixel_scale).value
+circle = plt.Circle((62, 64), circ_pixel, color='red', fill=False, 
+                    lw=1, ls='--')
+ax.add_patch(circle)
 ax.coords['ra'].set_axislabel('Right Ascension (J2000)')
 ax.coords['dec'].set_axislabel('Declination (J2000)')
 cbar = plt.colorbar(im)
 cbar.set_label('Peak (K)')
 plt.show()
 #%% Here we define the masks
-low_snr_mask = (cube > 3 * mad_std_map_sclip).include()
+low_snr_mask = (cube > 2 * mad_std_map_sclip).include()
 high_snr_mask = (cube > 5 * mad_std_map_sclip).include()
 
 # I decided to use 2 and 5 for the thresholds because more strict values would

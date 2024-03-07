@@ -83,7 +83,7 @@ ax.add_patch(Rectangle((1, 49), 68, 25, edgecolor='blue',ls='--', fill=False,
                        angle=-44.97, alpha=0.7))
 ax.add_patch(Rectangle((31, 26), 1.2*arcmin_pixel, 0.5*arcmin_pixel,
                        edgecolor='k', ls='--', fill=False,
-                       angle=44.97, alpha=0.7))
+                       angle=44.97, alpha=0.7, lw=2))
 
 
 plt.plot([6, 6 + arcmin_pixel], [6, 6], color='black', lw=2)
@@ -92,9 +92,9 @@ plt.text(6 + arcmin_pixel / 2, 8, '1 arcmin', color='black', ha='center', va='bo
 plt.grid(color='black', lw=0.5, alpha=0.3)
 
 cbar1 = fig.colorbar(im1, spacing='proportional')
-#cbar1.set_label('Integrated Intensity (K Km s$^{-1}$)')
-#cbar1.set_label('Velocity (Km s$^{-1}$)')
-cbar1.set_label('Line Width (Km s$^{-1}$)')
+#cbar1.set_label('Integrated Intensity (K km s$^{-1}$)')
+#cbar1.set_label('Velocity (km s$^{-1}$)')
+cbar1.set_label('Line Width (km s$^{-1}$)')
 
 ax.coords['ra'].set_axislabel('Right Ascension (J2000)')
 ax.coords['dec'].set_axislabel('Declination (J2000)')
