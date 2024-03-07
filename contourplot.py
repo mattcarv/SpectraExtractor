@@ -6,12 +6,12 @@ from astropy import units as u
 import numpy as np
 
 
-hdul = fits.open('/home/mdocarm/Downloads/PROJECTUGC2885-2022/montage/UGC2885FILES-part1/projectedwise1.fits')
+hdul = fits.open('C:/Users/mathe/OneDrive/Documents/GitHub/U2885_files/projectedwise1.fits')
 header = hdul[0].header
 data = hdul[0].data
 wcs = WCS(hdul[0].header)
 
-hdul2 = fits.open('/home/mdocarm/Downloads/PROJECTUGC2885-2022/montage/UGC2885FILES-part1/projectedwise4.fits')
+hdul2 = fits.open('C:/Users/mathe/OneDrive/Documents/GitHub/U2885_files/projectedwise4.fits')
 data2 = hdul2[0].data
 plt.rcParams.update({'font.size': 18})
 plt.rcParams["figure.figsize"] = (10,8)
@@ -38,6 +38,11 @@ cbar1.ax.tick_params(direction='out', labeltop=True, labelbottom=False, top=True
 cax2 = fig.add_axes([0.96, 0.1, 0.03, 0.8])
 cbar2 = fig.colorbar(im2, cax=cax2, pad=0.03)
 cbar2.set_label('Flux (log DN)')
+
+ax.annotate("", xy=(26, 23), xytext=(19, 23),
+            arrowprops=dict(arrowstyle="->", lw=2, color='red'),
+            ha='center', va='center', color='red', fontsize=14)
+ax.text(22, 23, 'HD279085', color='black', ha='right', va='bottom', fontsize=16)
 
 
 ax.coords['ra'].set_axislabel('Right Ascension (J2000)')
