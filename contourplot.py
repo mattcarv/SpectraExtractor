@@ -6,12 +6,12 @@ from astropy import units as u
 import numpy as np
 
 
-hdul = fits.open('C:/Users/mathe/OneDrive/Documents/GitHub/U2885_files/projectedwise1.fits')
+hdul = fits.open('C:/Users/mathe/Downloads/wise1testprojected.fits')
 header = hdul[0].header
 data = hdul[0].data
 wcs = WCS(hdul[0].header)
 
-hdul2 = fits.open('C:/Users/mathe/OneDrive/Documents/GitHub/U2885_files/projectedwise4.fits')
+hdul2 = fits.open('C:/Users/mathe/Downloads/wise4testprojected-2.fits')
 data2 = hdul2[0].data
 plt.rcParams.update({'font.size': 18})
 plt.rcParams["figure.figsize"] = (10,8)
@@ -24,7 +24,7 @@ fig, ax = plt.subplots(subplot_kw={'projection': wcs},
                                figsize=(10, 8))
 
 im1 = plt.imshow(np.log10(data), origin='lower', cmap='Greys')
-im2 = plt.contour(np.log10(data2), origin='lower', cmap='PuRd', alpha=0.9, vmin=2.3218)
+im2 = plt.contour(np.log10(data2), origin='lower', cmap='Reds', vmin=2.3218)
 plt.plot([6, 6 + arcmin_pixel], [6, 6], color='black', lw=2)
 plt.text(6 + arcmin_pixel / 2, 8, '1 arcmin', color='black',
          ha='center', va='bottom', fontsize=16)
@@ -39,10 +39,10 @@ cax2 = fig.add_axes([0.96, 0.1, 0.03, 0.8])
 cbar2 = fig.colorbar(im2, cax=cax2, pad=0.03)
 cbar2.set_label('Flux (log DN)')
 
-ax.annotate("", xy=(26, 23), xytext=(19, 23),
+ax.annotate("", xy=(26, 22), xytext=(19, 22),
             arrowprops=dict(arrowstyle="->", lw=2, color='red'),
             ha='center', va='center', color='red', fontsize=14)
-ax.text(22, 23, 'HD279085', color='black', ha='right', va='bottom', fontsize=16)
+ax.text(22, 22.5, 'HD279085', color='black', ha='right', va='bottom', fontsize=16)
 
 
 ax.coords['ra'].set_axislabel('Right Ascension (J2000)')
