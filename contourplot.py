@@ -25,6 +25,12 @@ fig, ax = plt.subplots(subplot_kw={'projection': wcs},
 
 im1 = plt.imshow(np.log10(data), origin='lower', cmap='Greys')
 im2 = plt.contour(np.log10(data2), origin='lower', cmap='Reds', vmin=2.3218)
+circ_radius = 50*u.arcsec
+conv_circ = circ_radius.to(u.deg)
+circ_pixel = (conv_circ/pixel_scale).value
+circle = plt.Circle((43, 34), circ_pixel, color='red', fill=False, 
+                    lw=1, ls='--')
+ax.add_patch(circle)
 plt.plot([6, 6 + arcmin_pixel], [6, 6], color='black', lw=2)
 plt.text(6 + arcmin_pixel / 2, 8, '1 arcmin', color='black',
          ha='center', va='bottom', fontsize=16)
