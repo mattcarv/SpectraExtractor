@@ -49,10 +49,10 @@ peak_intensity = cube.max(axis=0)
 pixel_scale = proj_plane_pixel_scales(wcs)[0] * u.deg / u.pixel
 arcmin = 1 * u.arcmin.to(u.deg)
 arcmin_pixel = (arcmin / pixel_scale).value
-circ_radius = 13.3*u.arcsec
+circ_radius = 22.2*u.arcsec
 conv_circ = circ_radius.to(u.deg)
 circ_pixel = (conv_circ/pixel_scale).value
-circle = plt.Circle((62, 64), circ_pixel, color='red', fill=False, 
+circle = plt.Circle((63, 64), circ_pixel, color='red', fill=False, 
                     lw=1, ls='--')
 
 
@@ -115,10 +115,10 @@ im = ax.imshow(mad_std_map_sclip.value, origin='lower', cmap='viridis', vmax=0.1
 ax.plot([6, 6 + arcmin_pixel], [6, 6], color='black', lw=2)
 ax.text(6 + arcmin_pixel / 2, 8, '1 arcmin', color='black',
           ha='center', va='bottom', fontsize=16)
-circ_radius = 13.3*u.arcsec
+circ_radius = 22.2*u.arcsec
 conv_circ = circ_radius.to(u.deg)
 circ_pixel = (conv_circ/pixel_scale).value
-circle = plt.Circle((62, 64), circ_pixel, color='red', fill=False, 
+circle = plt.Circle((63, 64), circ_pixel, color='red', fill=False, 
                     lw=1, ls='--')
 ax.add_patch(circle)
 ax.coords['ra'].set_axislabel('Right Ascension (J2000)')

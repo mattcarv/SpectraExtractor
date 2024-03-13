@@ -25,10 +25,10 @@ fig, ax = plt.subplots(subplot_kw={'projection': wcs},
 
 im1 = plt.imshow(np.log10(data), origin='lower', cmap='Greys')
 im2 = plt.contour(np.log10(data2), origin='lower', cmap='Reds', vmin=2.3218)
-circ_radius = 50*u.arcsec
+circ_radius = 3.98*u.arcsec
 conv_circ = circ_radius.to(u.deg)
 circ_pixel = (conv_circ/pixel_scale).value
-circle = plt.Circle((43, 34), circ_pixel, color='red', fill=False, 
+circle = plt.Circle((55, 44), circ_pixel, color='blue', fill=False, 
                     lw=1, ls='--')
 ax.add_patch(circle)
 plt.plot([6, 6 + arcmin_pixel], [6, 6], color='black', lw=2)
@@ -67,7 +67,7 @@ plt.show()
 from matplotlib.patches import Rectangle
 
 # Load FITS data
-hdul = fits.open('C:/Users/mathe/OneDrive/Documents/GitHub/U2885_files/moment2final.fits')
+hdul = fits.open('C:/Users/mathe/OneDrive/Documents/GitHub/U2885_files/moment0final.fits')
 header = hdul[0].header
 data = hdul[0].data
 wcs = WCS(header)
@@ -82,12 +82,12 @@ arcmin_pixel = (arcmin / pixel_scale).value
 fig, ax = plt.subplots(subplot_kw={'projection': wcs}, figsize=(10, 8))
 
 # Plot the moment map
-im1 = plt.imshow(data, origin='lower', cmap='coolwarm')
+im1 = plt.imshow(data, origin='lower', cmap='winter')
 
-circ_radius = 13.3*u.arcsec
+circ_radius = 22.2*u.arcsec
 conv_circ = circ_radius.to(u.deg)
 circ_pixel = (conv_circ/pixel_scale).value
-circle = plt.Circle((63, 64), circ_pixel, color='red', fill=False, 
+circle = plt.Circle((60, 64), circ_pixel, color='red', fill=False, 
                     lw=1, ls='--')
 ax.add_patch(circle)
 ax.add_patch(Rectangle((1, 49), 68, 25, edgecolor='blue',ls='--', fill=False,
@@ -103,11 +103,49 @@ plt.text(6 + arcmin_pixel / 2, 8, '1 arcmin', color='black', ha='center', va='bo
 plt.grid(color='black', lw=0.5, alpha=0.3)
 
 cbar1 = fig.colorbar(im1, spacing='proportional')
-#cbar1.set_label('Integrated Intensity (K km s$^{-1}$)')
+cbar1.set_label('Integrated Intensity (K km s$^{-1}$)')
 #cbar1.set_label('Velocity (km s$^{-1}$)')
-cbar1.set_label('Line Width (km s$^{-1}$)')
+#cbar1.set_label('Line Width (km s$^{-1}$)')
 
 ax.coords['ra'].set_axislabel('Right Ascension (J2000)')
 ax.coords['dec'].set_axislabel('Declination (J2000)')
 
 plt.show()
+
+#%%
+from spectral_cube import SpectralCube
+
+filename = fits.open('maskedcube_final.fits')
+
+cube = SpectralCube.read(filename, format='fits', use_dask=True)
+
+cube = cube.with_spectral_unit(u.km / u.s)
+
+header = filename[0].header
+wcs = WCS(filename[0].header)
+peak_intensity = cube.max(axis=0)
+
+pixel_scale = proj_plane_pixel_scales(wcs)[0] * u.deg / u.pixel
+arcmin = 1 * u.arcmin.to(u.deg)
+arcmin_pixel = (arcmin / pixel_scale).value
+circ_radius = 22.2*u.arcsec
+conv_circ = circ_radius.to(u.deg)
+circ_pixel = (conv_circ/pixel_scale).value
+circle = plt.Circle((63, 64), circ_pixel, color='red', fill=False, 
+                    lw=1, ls='--')
+
+
+plt.figure(figsize=(10,8))
+ax = plt.subplot(projection=peak_intensity.wcs)
+ax.add_patch(circle)
+ax.grid(True, color='k', lw=0.5, alpha=0.3)
+im = ax.imshow(peak_intensity.value, origin='lower', cmap='viridis')
+ax.plot([6, 6 + arcmin_pixel], [6, 6], color='black', lw=2)
+ax.text(6 + arcmin_pixel / 2, 8, '1 arcmin', color='black',
+          ha='center', va='bottom', fontsize=16)
+ax.coords['ra'].set_axislabel('Right Ascension (J2000)')
+ax.coords['dec'].set_axislabel('Declination (J2000)')
+cbar = plt.colorbar(im)
+cbar.set_label('Peak (K)')
+plt.show()
+

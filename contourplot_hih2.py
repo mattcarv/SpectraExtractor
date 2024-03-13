@@ -4,6 +4,7 @@ from astropy.wcs import WCS
 from astropy.wcs.utils import proj_plane_pixel_scales
 from astropy import units as u
 from matplotlib.patches import Rectangle
+from matplotlib.patches import Ellipse
 
 
 hdul = fits.open('C:/Users/mathe/OneDrive/Documents/GitHub/U2885_files/projected_deidre.fits')
@@ -23,7 +24,7 @@ arcmin_pixel = (arcmin / pixel_scale).value
 fig, ax = plt.subplots(subplot_kw={'projection': wcs}, 
                                figsize=(10, 8))
 
-circ_radius = 13.3*u.arcsec
+circ_radius = 22.2*u.arcsec
 conv_circ = circ_radius.to(u.deg)
 circ_pixel = (conv_circ/pixel_scale).value
 circle = plt.Circle((63, 64), circ_pixel, color='red', fill=False, 
@@ -31,6 +32,14 @@ circle = plt.Circle((63, 64), circ_pixel, color='red', fill=False,
 ax.add_patch(circle)
 ax.add_patch(Rectangle((1, 49), 68, 25, edgecolor='blue',ls='--', fill=False,
                        angle=-44.97, alpha=0.7))
+
+ell_b = 19*u.arcsec
+ell_a = 13*u.arcsec
+conv_b = ell_b.to(u.deg)/pixel_scale
+conv_a = ell_a.to(u.deg)/pixel_scale
+ellipse = Ellipse((63, 54), width=conv_b.value, height=conv_a.value,
+                  angle=-44.97, color='red', fill=False, lw=1, ls='-')
+ax.add_patch(ellipse)
 
 im1 = plt.imshow(data2, origin='lower', cmap='winter')
 im2 = plt.contour(data, origin='lower', cmap='PuRd', alpha=0.9, vmin=0)
