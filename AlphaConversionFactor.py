@@ -3,8 +3,8 @@ import numpy as np
 z_12 = [9.21, 9.20, 9.05]
 
 def MetaConv(z_list):
-    solar_z_12 = 8.69
-    solar_z = 0.0134
+    solar_z_12 = 8.7
+    solar_z = 0.014
     
     z_sol = [(10**(z - solar_z_12)) * solar_z for z in z_list]
     
