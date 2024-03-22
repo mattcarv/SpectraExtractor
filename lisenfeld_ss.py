@@ -6,7 +6,7 @@ from scipy.optimize import curve_fit
 plt.rcParams["figure.figsize"] = [10, 8]
 plt.rcParams.update({'font.size': 18})
 
-dat = Table.read('/home/mdocarm/Downloads/lisenfeld_ss.csv')
+dat = Table.read('lisenfeld_ss.csv')
 df = dat.to_pandas()
 
 u2885 = pd.DataFrame({'logMstar': [11.68], 'logSFR': [0.21], 'logMmolMstar': [-0.41]})
@@ -32,7 +32,8 @@ y_fit = curve_function(x_fit, *params)
 
 y_dotted = curve_function(x_fit, params[0], params[1], params[2])
 
-plt.scatter(df.logMstar, df.logSFR, c=df.logMmolMstar, cmap='PuBu')
+plt.scatter(df.logMstar, df.logSFR, c=df.logMmolMstar, cmap='PuBu',
+            edgecolors='blue')
 plt.text(11.63, 0.25, 'UGC 2885', c='black', fontsize=12)
 # plt.plot(x_fit, y_fit, 'k', linewidth=2)
 # plt.plot(x_fit, y_dotted+0.4, 'k-.', linewidth=1)
