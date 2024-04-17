@@ -131,7 +131,7 @@ arcmin_pixel = (arcmin / pixel_scale).value
 circ_radius = 22.2*u.arcsec
 conv_circ = circ_radius.to(u.deg)
 circ_pixel = (conv_circ/pixel_scale).value
-circle = plt.Circle((63, 64), circ_pixel, color='red', fill=False, 
+circle = plt.Circle((63, 64), circ_pixel, color='red', fill=False,  
                     lw=1, ls='--')
 
 
@@ -148,4 +148,86 @@ ax.coords['dec'].set_axislabel('Declination (J2000)')
 cbar = plt.colorbar(im)
 cbar.set_label('Peak (K)')
 plt.show()
+
+# Calculate the number of NaN pixels
+nan_pixels = np.sum(np.isnan(peak_intensity.value))
+
+# Calculate the number of non-NaN pixels
+non_nan_pixels = np.sum(~np.isnan(peak_intensity.value))
+
+print("Number of NaN pixels:", nan_pixels)
+print("Number of non-NaN pixels:", non_nan_pixels)
+
+x, y = np.meshgrid(np.arange(hdul[0].data.shape[1]), np.arange(hdul[0].data.shape[0]))
+
+# Calculate the distance of each pixel from the center of the circle
+dist_from_center = np.sqrt((x - 63)**2 + (y - 64)**2)
+
+# Count the number of pixels inside the circle
+pix_circle = np.sum(dist_from_center <= circ_pixel)
+
+# Print the number of pixels inside the circle
+print(f"Number of pixels inside the circle: {pix_circle}")
+ #%%
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.patches import Ellipse
+import matplotlib.patches as patches
+from spectral_cube import SpectralCube
+from astropy.io import fits
+from astropy.wcs import WCS
+from astropy import units as u
+
+# Load the data
+filename = 'maskedcube_final.fits'
+cube = SpectralCube.read(filename, format='fits', use_dask=True)
+cube = cube.with_spectral_unit(u.km / u.s)
+header = fits.getheader(filename)
+wcs = WCS(header)
+peak_intensity = cube.max(axis=0)
+
+g_ell_center_small = (33, 33)
+g_ell_width_small = 24 * 2
+g_ell_height_small = 10.08 * 2
+angle_small = 315.71316
+
+ellipse = patches.Ellipse(g_ell_center_small, g_ell_width_small, g_ell_height_small, angle=angle_small, fill=False, edgecolor='red', linewidth=2)
+
+
+# Plot the figure
+plt.figure(figsize=(10, 8))
+ax = plt.subplot(projection=peak_intensity.wcs)
+ax.add_patch(ellipse)
+im = ax.imshow(peak_intensity.value, origin='lower', cmap='viridis')
+
+
+# Customize plot
+ax.grid(True, color='k', lw=0.5, alpha=0.3)
+ax.coords['ra'].set_axislabel('Right Ascension (J2000)')
+ax.coords['dec'].set_axislabel('Declination (J2000)')
+cbar = plt.colorbar(im)
+cbar.set_label('Peak (K)')
+
+# Show the plot
+plt.show()
+
+x, y = np.meshgrid(np.arange(hdul[0].data.shape[1]), np.arange(hdul[0].data.shape[0]))
+
+cos_angle = np.cos(np.radians(180. - angle_small))
+sin_angle = np.sin(np.radians(180. - angle_small))
+
+xc = x - g_ell_center_small[0]
+yc = y - g_ell_center_small[1]
+
+xct = xc * cos_angle - yc * sin_angle
+yct = xc * sin_angle + yc * cos_angle
+
+rad_cc = (xct**2 / (g_ell_width_small / 2.)**2) + (yct**2 / (g_ell_height_small / 2.)**2)
+pix_ell = np.sum(rad_cc <= 1.0)
+pix_ell_values = hdul[0].data[rad_cc <= 1.0]
+nan_pixels = np.sum(np.isnan(pix_ell_values))
+
+print(nan_pixels)
+
+print(f"Number of pixels inside the ellipse: {pix_ell}")
 
