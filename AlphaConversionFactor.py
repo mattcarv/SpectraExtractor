@@ -1,6 +1,6 @@
 import numpy as np
 
-z_12 = [8.98, 8.95, 8.97]
+z_12 = [9.28, 8.74, 9.08]
 
 def MetaConv(z_list):
     solar_z_12 = 8.7
