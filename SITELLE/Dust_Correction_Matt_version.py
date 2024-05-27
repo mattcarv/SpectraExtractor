@@ -25,7 +25,7 @@ import numpy as np
 from extinction import remove, fm07
 
 def extinction(wavelength, flux):
-    corrected_flux = remove(fm07(wavelength, 1.0), flux)
+    corrected_flux = remove(fm07(wavelength, 0.63), flux)
     return corrected_flux
 
 extinction_corrected_OII3726 = []
