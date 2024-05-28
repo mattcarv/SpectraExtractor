@@ -10,7 +10,7 @@ plt.rcParams.update({'font.size': 18})
 #dat = Table.read('/home/mdocarm/Downloads/xCOLDGASS_PubCat.fits')
 dat = Table.read('C:/Users/mathe/Downloads/xcoldgass_hi')
 df = dat.to_pandas()
-
+print(df.LOGMH2.max())
 
 # SELECTION
 
@@ -26,7 +26,7 @@ df = df.assign(LOGTDEP_HI = tdep_hi)
 df = df.assign(LOGTDEP_H2 = tdep_h2)
 
 df = pd.concat([df, u2885])
-
+#%%
 
 def curve_function(x, a, b, c):
     return a * x - b * x**2 + c * x**3
