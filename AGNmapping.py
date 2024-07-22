@@ -123,6 +123,7 @@ print(f"Peak Position (x, y): ({x_peak}, {y_peak})")
 import matplotlib.patches as patches
 from astropy.wcs.utils import proj_plane_pixel_scales
 import astropy.units as u
+plt.rcParams["figure.figsize"] = [10, 8]
 
 fig, ax = plt.subplots(subplot_kw={'projection': wcs})
 
